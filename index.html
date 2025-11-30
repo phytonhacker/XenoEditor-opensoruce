@@ -1,0 +1,3652 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XenoEditor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/show-hint.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #3f4447;
+            overflow: hidden;
+            color: #ccc;
+        }
+
+        /* ==================== WELCOME SCREEN ==================== */
+        #welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #2b2b2b;
+            display: flex;
+            z-index: 9999;
+        }
+
+        #welcome-sidebar {
+            width: 300px;
+            background: linear-gradient(180deg, #41516c 0%, #2d3a4f 50%, #1a2332 100%);
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #welcome-logo {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        #welcome-logo-icon {
+            font-size: 64px;
+            margin-bottom: 15px;
+        }
+
+        #welcome-logo h1 {
+            font-size: 28px;
+            font-weight: 300;
+            color: #fff;
+            letter-spacing: 3px;
+        }
+
+        #welcome-logo p {
+            font-size: 11px;
+            color: #8899aa;
+            margin-top: 5px;
+        }
+
+        #welcome-nav {
+            flex: 1;
+        }
+
+        .welcome-nav-item {
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #aabbcc;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .welcome-nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        .welcome-nav-item.active {
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+        }
+
+        .welcome-nav-icon {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        #welcome-main {
+            flex: 1;
+            background: #2b2b2b;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        #welcome-content h2 {
+            font-size: 24px;
+            font-weight: 400;
+            color: #ddd;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #444;
+        }
+
+        .welcome-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .welcome-card {
+            background: #363636;
+            border: 1px solid #4a4a4a;
+            border-radius: 6px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .welcome-card:hover {
+            background: #404040;
+            border-color: #5a9cf9;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .welcome-card-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .welcome-card h3 {
+            font-size: 16px;
+            font-weight: 500;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .welcome-card p {
+            font-size: 12px;
+            color: #999;
+            line-height: 1.5;
+        }
+
+        #recent-projects-section h3 {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .recent-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            background: #363636;
+            border: 1px solid #444;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .recent-item:hover {
+            background: #404040;
+            border-color: #5a9cf9;
+        }
+
+        .recent-item-icon {
+            font-size: 24px;
+        }
+
+        .recent-item-info h4 {
+            font-size: 13px;
+            color: #ddd;
+        }
+
+        .recent-item-info p {
+            font-size: 11px;
+            color: #777;
+        }
+
+        /* ==================== NEW PROJECT WIZARD ==================== */
+        #new-project-wizard {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        #wizard-box {
+            background: #3c3f41;
+            border: 1px solid #555;
+            width: 650px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #wizard-header {
+            background: linear-gradient(180deg, #4a4d4e 0%, #3c3f41 100%);
+            padding: 15px 20px;
+            border-bottom: 1px solid #555;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        #wizard-header-icon {
+            font-size: 28px;
+        }
+
+        #wizard-header h3 {
+            font-size: 16px;
+            color: #ddd;
+        }
+
+        #wizard-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .wizard-section {
+            margin-bottom: 25px;
+        }
+
+        .wizard-section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .wizard-project-types {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .wizard-type-card {
+            background: #2b2b2b;
+            border: 2px solid #444;
+            border-radius: 4px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .wizard-type-card:hover {
+            background: #333;
+            border-color: #666;
+        }
+
+        .wizard-type-card.selected {
+            border-color: #5a9cf9;
+            background: #2d3a4a;
+        }
+
+        .wizard-type-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .wizard-type-name {
+            font-size: 12px;
+            color: #ccc;
+        }
+
+        .wizard-field {
+            margin-bottom: 15px;
+        }
+
+        .wizard-field label {
+            display: block;
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 6px;
+        }
+
+        .wizard-field input, .wizard-field select {
+            width: 100%;
+            padding: 8px 10px;
+            background: #2b2b2b;
+            border: 1px solid #555;
+            color: #ddd;
+            font-size: 13px;
+        }
+
+        .wizard-field input:focus, .wizard-field select:focus {
+            outline: none;
+            border-color: #5a9cf9;
+        }
+
+        .wizard-field-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .wizard-field-row .wizard-field {
+            flex: 1;
+        }
+
+        .wizard-location-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .wizard-location-row input {
+            flex: 1;
+        }
+
+        .wizard-location-row button {
+            padding: 8px 15px;
+            background: #4a4d4e;
+            border: 1px solid #555;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .wizard-location-row button:hover {
+            background: #555;
+        }
+
+        #mc-options {
+            display: none;
+            padding: 15px;
+            background: #2b2b2b;
+            border: 1px solid #444;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+
+        #mc-options.visible {
+            display: block;
+        }
+
+        #wizard-footer {
+            padding: 15px 20px;
+            background: #333;
+            border-top: 1px solid #555;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .wizard-btn {
+            padding: 8px 20px;
+            border: 1px solid #555;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .wizard-btn-cancel {
+            background: #4a4d4e;
+            color: #ccc;
+        }
+
+        .wizard-btn-create {
+            background: #365880;
+            border-color: #4a7ab0;
+            color: #fff;
+        }
+
+        .wizard-btn-create:disabled {
+            background: #444;
+            color: #777;
+            cursor: not-allowed;
+        }
+
+        /* ==================== MAIN APP ==================== */
+        #app-container {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            flex-direction: column;
+            background: #3c3f41;
+        }
+
+        #app-container.active {
+            display: flex;
+        }
+
+        /* Toolbar */
+        #main-toolbar {
+            background: linear-gradient(180deg, #4a4d4e 0%, #3c3f41 100%);
+            border-bottom: 1px solid #323232;
+            padding: 3px 8px;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            height: 32px;
+        }
+
+        .toolbar-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 3px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #ccc;
+        }
+
+        .toolbar-btn:hover {
+            background: #555;
+            border-color: #666;
+        }
+
+        .toolbar-separator {
+            width: 1px;
+            height: 20px;
+            background: #555;
+            margin: 0 5px;
+        }
+
+        .toolbar-label {
+            font-size: 11px;
+            color: #999;
+            margin-left: auto;
+            margin-right: 10px;
+        }
+
+        /* Main Content */
+        #main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        #sidebar {
+            width: 280px;
+            background: #3c3f41;
+            border-right: 1px solid #323232;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #sidebar-header {
+            padding: 8px 10px;
+            background: #313335;
+            border-bottom: 1px solid #323232;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #sidebar-title {
+            font-size: 12px;
+            color: #bbb;
+        }
+
+        #sidebar-actions button {
+            background: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            padding: 3px 5px;
+            font-size: 14px;
+        }
+
+        #sidebar-actions button:hover {
+            color: #ccc;
+        }
+
+        #file-tree {
+            flex: 1;
+            overflow-y: auto;
+            background: #313335;
+            padding: 5px 0;
+        }
+
+        .tree-item {
+            padding: 3px 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: #bbb;
+            border-left: 2px solid transparent;
+        }
+
+        .tree-item:hover {
+            background: #2d2f30;
+        }
+
+        .tree-item.selected {
+            background: #214283;
+            color: #fff;
+            border-left-color: #5a9cf9;
+        }
+
+        .tree-icon {
+            margin-right: 5px;
+            font-size: 14px;
+            width: 18px;
+            text-align: center;
+        }
+
+        .tree-children {
+            margin-left: 15px;
+        }
+
+        /* Editor */
+        #editor-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #2b2b2b;
+        }
+
+        #tabs-header {
+            background: #3c3f41;
+            border-bottom: 1px solid #323232;
+            display: flex;
+            align-items: flex-end;
+            overflow-x: auto;
+            height: 28px;
+            padding-left: 5px;
+        }
+
+        .tab {
+            display: flex;
+            align-items: center;
+            padding: 5px 12px;
+            background: #3c3f41;
+            border: 1px solid #323232;
+            border-bottom: none;
+            cursor: pointer;
+            font-size: 11px;
+            color: #999;
+            border-radius: 4px 4px 0 0;
+            margin-right: 2px;
+        }
+
+        .tab:hover {
+            background: #454749;
+            color: #ccc;
+        }
+
+        .tab.active {
+            background: #2b2b2b;
+            color: #fff;
+            border-bottom: 1px solid #2b2b2b;
+            margin-bottom: -1px;
+        }
+
+        .tab-icon {
+            margin-right: 5px;
+            font-size: 12px;
+        }
+
+        .tab-close {
+            margin-left: 8px;
+            color: #666;
+            font-size: 14px;
+            width: 16px;
+            height: 16px;
+            text-align: center;
+            line-height: 16px;
+            border-radius: 3px;
+        }
+
+        .tab-close:hover {
+            background: #c75450;
+            color: #fff;
+        }
+
+        #editor-content {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #no-file {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #666;
+            text-align: center;
+        }
+
+        #no-file p:first-child {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .CodeMirror {
+            height: 100% !important;
+            font-size: 13px;
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+            background: #2b2b2b;
+        }
+
+        /* ==================== CONSOLE PANEL ==================== */
+        #console-panel {
+            height: 0;
+            background: #2b2b2b;
+            border-top: 1px solid #323232;
+            display: flex;
+            flex-direction: column;
+            transition: height 0.3s ease;
+            overflow: hidden;
+        }
+
+        #console-panel.open {
+            height: 280px;
+        }
+
+        #console-header {
+            background: #313335;
+            padding: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #323232;
+            min-height: 32px;
+        }
+
+        #console-tabs {
+            display: flex;
+            height: 100%;
+        }
+
+        .console-tab {
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: #888;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .console-tab:hover {
+            background: #3c3f41;
+            color: #ccc;
+        }
+
+        .console-tab.active {
+            color: #fff;
+            border-bottom-color: #5a9cf9;
+            background: #3c3f41;
+        }
+
+        .console-tab-badge {
+            background: #c75450;
+            color: #fff;
+            font-size: 10px;
+            padding: 1px 6px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .console-tab-badge.warning {
+            background: #c9a227;
+        }
+
+        .console-tab-badge.info {
+            background: #3794ff;
+        }
+
+        #console-actions {
+            display: flex;
+            gap: 5px;
+            padding-right: 10px;
+        }
+
+        #console-actions button {
+            background: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            padding: 3px 6px;
+            font-size: 14px;
+        }
+
+        #console-actions button:hover {
+            color: #ccc;
+        }
+
+        /* Console Content Areas */
+        .console-content {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .console-content.active {
+            display: flex;
+        }
+
+        #console-output {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 12px;
+            background: #1e1e1e;
+        }
+
+        .console-line {
+            margin-bottom: 2px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .console-line.stdout {
+            color: #a9b7c6;
+        }
+
+        .console-line.stderr {
+            color: #f44747;
+        }
+
+        .console-line.info {
+            color: #6a9955;
+        }
+
+        .console-line.command {
+            color: #569cd6;
+        }
+
+        #console-input-container {
+            display: flex;
+            background: #1e1e1e;
+            border-top: 1px solid #323232;
+        }
+
+        #console-prompt {
+            padding: 8px 10px;
+            color: #6a9955;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+        }
+
+        #console-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #a9b7c6;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            padding: 8px 0;
+        }
+
+        #console-input:focus {
+            outline: none;
+        }
+
+        /* ==================== PROBLEMS TAB ==================== */
+        #problems-content {
+            background: #1e1e1e;
+        }
+
+        #problems-toolbar {
+            display: flex;
+            align-items: center;
+            padding: 6px 10px;
+            background: #252526;
+            border-bottom: 1px solid #323232;
+            gap: 15px;
+        }
+
+        .problems-filter {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            color: #888;
+        }
+
+        .problems-filter input {
+            margin-right: 3px;
+        }
+
+        .problems-count {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+        }
+
+        .problems-count-error {
+            color: #f44747;
+        }
+
+        .problems-count-warning {
+            color: #cca700;
+        }
+
+        .problems-count-info {
+            color: #3794ff;
+        }
+
+        #problems-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .problem-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 6px 10px;
+            border-bottom: 1px solid #2d2d2d;
+            cursor: pointer;
+            font-size: 12px;
+            gap: 10px;
+        }
+
+        .problem-item:hover {
+            background: #2a2d2e;
+        }
+
+        .problem-icon {
+            font-size: 14px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .problem-icon.error {
+            color: #f44747;
+        }
+
+        .problem-icon.warning {
+            color: #cca700;
+        }
+
+        .problem-icon.info {
+            color: #3794ff;
+        }
+
+        .problem-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .problem-message {
+            color: #ccc;
+            margin-bottom: 2px;
+            word-break: break-word;
+        }
+
+        .problem-location {
+            color: #888;
+            font-size: 11px;
+        }
+
+        .problem-source {
+            color: #666;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+
+        #no-problems {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #666;
+        }
+
+        #no-problems-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        /* Terminal Content */
+        #terminal-content {
+            background: #1e1e1e;
+        }
+
+        #terminal-output {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            color: #a9b7c6;
+        }
+
+        /* Status Bar */
+        #status-bar {
+            background: #3c3f41;
+            border-top: 1px solid #323232;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            font-size: 11px;
+            color: #888;
+        }
+
+        .status-item {
+            padding: 0 10px;
+            border-right: 1px solid #555;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-item:last-child {
+            border-right: none;
+        }
+
+        .status-problems {
+            cursor: pointer;
+        }
+
+        .status-problems:hover {
+            color: #ccc;
+        }
+
+        .status-error-count {
+            color: #f44747;
+        }
+
+        .status-warning-count {
+            color: #cca700;
+        }
+
+        /* Context Menu & Dialog */
+        #context-menu {
+            position: fixed;
+            background: #3c3f41;
+            border: 1px solid #555;
+            padding: 4px 0;
+            z-index: 1000;
+            display: none;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+            min-width: 180px;
+        }
+
+        .context-menu-item {
+            padding: 6px 15px;
+            cursor: pointer;
+            color: #bbb;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .context-menu-item:hover {
+            background: #214283;
+            color: #fff;
+        }
+
+        .context-menu-separator {
+            height: 1px;
+            background: #555;
+            margin: 4px 0;
+        }
+
+        .context-menu-icon {
+            margin-right: 10px;
+            width: 16px;
+        }
+
+        /* Recent Project Context Menu */
+        #recent-context-menu {
+            position: fixed;
+            background: #3c3f41;
+            border: 1px solid #555;
+            padding: 4px 0;
+            z-index: 10001;
+            display: none;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+            min-width: 220px;
+        }
+
+        #recent-context-menu .context-menu-item {
+            padding: 6px 15px;
+            cursor: pointer;
+            color: #bbb;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        #recent-context-menu .context-menu-item:hover {
+            background: #214283;
+            color: #fff;
+        }
+
+        #recent-context-menu .context-menu-item#ctx-recent-delete:hover {
+            background: #c75450;
+        }
+
+        #recent-context-menu .context-menu-separator {
+            height: 1px;
+            background: #555;
+            margin: 4px 0;
+        }
+
+        #recent-context-menu .context-menu-icon {
+            margin-right: 10px;
+            width: 16px;
+        }
+
+        #input-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        #input-dialog-box {
+            background: #3c3f41;
+            border: 1px solid #555;
+            width: 400px;
+        }
+
+        #input-dialog-header {
+            background: #313335;
+            padding: 12px 15px;
+            border-bottom: 1px solid #555;
+        }
+
+        #input-dialog-title {
+            font-size: 13px;
+            color: #ccc;
+        }
+
+        #input-dialog-content {
+            padding: 20px;
+        }
+
+        #input-dialog-input {
+            width: 100%;
+            padding: 8px 10px;
+            background: #2b2b2b;
+            border: 1px solid #555;
+            color: #ccc;
+            font-size: 13px;
+        }
+
+        #input-dialog-input:focus {
+            outline: none;
+            border-color: #5a9cf9;
+        }
+
+        #input-dialog-buttons {
+            padding: 15px 20px;
+            background: #313335;
+            border-top: 1px solid #555;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .input-dialog-btn {
+            padding: 6px 18px;
+            border: 1px solid #555;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .input-dialog-btn-ok {
+            background: #365880;
+            color: #fff;
+        }
+
+        .input-dialog-btn-cancel {
+            background: #4a4d4e;
+            color: #ccc;
+        }
+
+        /* Toast Notification */
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #365880;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 99999;
+            animation: fadeInOut 2s ease;
+        }
+
+        .toast-notification.success {
+            background: #6a9955;
+        }
+
+        .toast-notification.error {
+            background: #c75450;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
+        .CodeMirror-hints {
+            background: #2d2d2d !important;
+            border: 1px solid #454545 !important;
+            border-radius: 4px;
+            box-shadow: 2px 3px 10px rgba(0,0,0,.4);
+        }
+        .CodeMirror-hint {
+            color: #ffffff !important;
+            padding: 4px 8px !important;
+        }
+        .CodeMirror-hint-active {
+            background: #214283 !important;
+            padding: 4px 8px !important;
+        }
+        /* ==================== FIND & REPLACE PANEL ==================== */
+        #find-panel {
+            display: none;
+            background: #3c3f41;
+            border-bottom: 1px solid #323232;
+            padding: 8px 10px;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        #find-panel.open {
+            display: flex;
+        }
+
+        #find-panel.replace-mode #replace-row {
+            display: flex;
+        }
+
+        #find-row, #replace-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #replace-row {
+            display: none;
+        }
+
+        .find-input-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: #2b2b2b;
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: 0 8px;
+            max-width: 400px;
+        }
+
+        .find-input-wrapper:focus-within {
+            border-color: #5a9cf9;
+        }
+
+        .find-icon {
+            font-size: 12px;
+            margin-right: 6px;
+            opacity: 0.7;
+        }
+
+        #find-input, #replace-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #ccc;
+            font-size: 13px;
+            padding: 6px 0;
+            outline: none;
+            font-family: 'Consolas', monospace;
+        }
+
+        #find-input::placeholder, #replace-input::placeholder {
+            color: #666;
+        }
+
+        .find-count {
+            font-size: 11px;
+            color: #888;
+            margin-left: 8px;
+            white-space: nowrap;
+        }
+
+        .find-count.no-results {
+            color: #f44747;
+        }
+
+        .find-buttons {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .find-btn {
+            background: #4a4d4e;
+            border: 1px solid #555;
+            color: #ccc;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.15s;
+        }
+
+        .find-btn:hover {
+            background: #555;
+            border-color: #666;
+        }
+
+        .find-btn:active {
+            background: #333;
+        }
+
+        .find-close {
+            background: transparent;
+            border: none;
+            font-size: 14px;
+            padding: 5px 8px;
+            opacity: 0.7;
+        }
+
+        .find-close:hover {
+            opacity: 1;
+            background: #c75450;
+            color: #fff;
+        }
+
+        .replace-btn {
+            background: #365880;
+            border-color: #4a7ab0;
+        }
+
+        .replace-btn:hover {
+            background: #4a7ab0;
+        }
+
+        .find-option {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 11px;
+            color: #888;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            user-select: none;
+        }
+
+        .find-option:hover {
+            background: #4a4d4e;
+        }
+
+        .find-option input {
+            display: none;
+        }
+
+        .find-option.active {
+            background: #214283;
+            color: #fff;
+            border-color: #5a9cf9;
+        }
+
+        /* Highlight matches in editor */
+        .cm-searching {
+            background: rgba(255, 213, 0, 0.3) !important;
+            border-bottom: 1px solid #ffd500;
+        }
+
+        .cm-searching.current {
+            background: rgba(255, 150, 0, 0.5) !important;
+            border-bottom: 2px solid #ff9600;
+        }
+
+        /* Search matches on scrollbar */
+        .CodeMirror-search-match {
+            background: #ffd500;
+            border-top: 1px solid #ffa500;
+            border-bottom: 1px solid #ffa500;
+            opacity: 0.7;
+        }
+        /* Scrollbars */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #2b2b2b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Welcome Screen -->
+    <div id="welcome-screen">
+        <div id="welcome-sidebar">
+            <div id="welcome-logo">
+                <div id="welcome-logo-icon">⚡</div>
+                <h1>XenoEditor</h1>
+                <p>Eclipse-Style IDE</p>
+            </div>
+            <div id="welcome-nav">
+                <div class="welcome-nav-item active">
+                    <span class="welcome-nav-icon">🏠</span>
+                    Start
+                </div>
+            </div>
+        </div>
+        <div id="welcome-main">
+            <div id="welcome-content">
+                <h2>Start</h2>
+                <div class="welcome-cards">
+                    <div class="welcome-card" id="card-new-project">
+                        <div class="welcome-card-icon">📁</div>
+                        <h3>New Project</h3>
+                        <p>Create a new Minecraft plugin, mod, or general project</p>
+                    </div>
+                    <div class="welcome-card" id="card-open-project">
+                        <div class="welcome-card-icon">📂</div>
+                        <h3>Open Project</h3>
+                        <p>Open an existing project folder</p>
+                    </div>
+                </div>
+                <div id="recent-projects-section">
+                    <h3>📋 Recent Projects</h3>
+                    <div id="recent-projects-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Project Wizard -->
+    <div id="new-project-wizard">
+        <div id="wizard-box">
+            <div id="wizard-header">
+                <span id="wizard-header-icon">📁</span>
+                <h3>New Project</h3>
+            </div>
+            <div id="wizard-content">
+                <div class="wizard-section">
+                    <div class="wizard-section-title">Project Type</div>
+                    <div class="wizard-project-types">
+                        <div class="wizard-type-card" data-type="minecraft-plugin">
+                            <div class="wizard-type-icon">🔌</div>
+                            <div class="wizard-type-name">MC Plugin</div>
+                        </div>
+                        <div class="wizard-type-card" data-type="minecraft-mod">
+                            <div class="wizard-type-icon">🎮</div>
+                            <div class="wizard-type-name">MC Mod</div>
+                        </div>
+                        <div class="wizard-type-card" data-type="java">
+                            <div class="wizard-type-icon">☕</div>
+                            <div class="wizard-type-name">Java</div>
+                        </div>
+                        <div class="wizard-type-card" data-type="web">
+                            <div class="wizard-type-icon">🌐</div>
+                            <div class="wizard-type-name">Web</div>
+                        </div>
+                        <div class="wizard-type-card" data-type="python">
+                            <div class="wizard-type-icon">🐍</div>
+                            <div class="wizard-type-name">Python</div>
+                        </div>
+                        <div class="wizard-type-card" data-type="empty">
+                            <div class="wizard-type-icon">📄</div>
+                            <div class="wizard-type-name">Empty</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="mc-options">
+                    <div class="wizard-field-row">
+                        <div class="wizard-field">
+                            <label>Minecraft Version</label>
+                            <select id="mc-version">
+                                <option value="1.21">1.21</option>
+                                <option value="1.20.4">1.20.4</option>
+                                <option value="1.20.1" selected>1.20.1</option>
+                                <option value="1.19.4">1.19.4</option>
+                                <option value="1.18.2">1.18.2</option>
+                                <option value="1.16.5">1.16.5</option>
+                                <option value="1.12.2">1.12.2</option>
+                            </select>
+                        </div>
+                        <div class="wizard-field" id="mod-loader-field" style="display: none;">
+                            <label>Mod Loader</label>
+                            <select id="mod-loader">
+                                <option value="forge">Forge</option>
+                                <option value="fabric">Fabric</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wizard-section">
+                    <div class="wizard-section-title">Project Details</div>
+                    <div class="wizard-field">
+                        <label>Project Name</label>
+                        <input type="text" id="project-name" placeholder="MyProject">
+                    </div>
+                    <div class="wizard-field">
+                        <label>Location</label>
+                        <div class="wizard-location-row">
+                            <input type="text" id="project-location" readonly placeholder="Select location...">
+                            <button id="browse-btn">Browse...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="wizard-footer">
+                <button class="wizard-btn wizard-btn-cancel" id="wizard-cancel">Cancel</button>
+                <button class="wizard-btn wizard-btn-create" id="wizard-create" disabled>Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app-container">
+        <div id="main-toolbar">
+            <button class="toolbar-btn" id="btn-home" title="Home">🏠</button>
+            <div class="toolbar-separator"></div>
+            <button class="toolbar-btn" id="btn-new-file" title="New File">📄</button>
+            <button class="toolbar-btn" id="btn-save" title="Save">💾</button>
+            <div class="toolbar-separator"></div>
+            <button class="toolbar-btn" id="btn-run" title="Run (F5)">▶️</button>
+            <button class="toolbar-btn" id="btn-build" title="Build (Ctrl+B)">🔨</button>
+            <button class="toolbar-btn" id="btn-analyze" title="Analyze Problems">🔍</button>
+            <div class="toolbar-separator"></div>
+            <button class="toolbar-btn" id="btn-terminal" title="Toggle Console">💻</button>
+            <span class="toolbar-label" id="project-label">No project</span>
+        </div>
+
+        <div id="main-content">
+            <div id="sidebar">
+                <div id="sidebar-header">
+                    <span id="sidebar-title">📁 Project Explorer</span>
+                    <div id="sidebar-actions">
+                        <button id="btn-refresh" title="Refresh">🔄</button>
+                        <button id="btn-collapse" title="Collapse">📁</button>
+                    </div>
+                </div>
+                <div id="file-tree"></div>
+            </div>
+
+            <div id="editor-container">
+                <div id="tabs-header"></div>
+                <div id="find-panel">
+                    <div id="find-row">
+                        <div class="find-input-wrapper">
+                            <span class="find-icon">🔍</span>
+                            <input type="text" id="find-input" placeholder="Find...">
+                            <span class="find-count" id="find-count"></span>
+                        </div>
+                        <div class="find-buttons">
+                            <button class="find-btn" id="find-prev" title="Previous (Shift + f3)">◀</button>
+                            <button class="find-btn" id="find-next" title="Next (F3)">▶</button>
+                            <button class="find-btn replace-btn" id="replace-one" title="Replace">Replace</button>
+                            <button class="find-btn replace-btn" id="replace-all" title="Replace All">All</button>
+                            <label class="find-option" title="Case Sensitive">
+                                <input type="checkbox" id="find-case">
+                                Aa
+                            </label>
+                            <label class="find-option" title="Regular Expression">
+                                <input type="checkbox" id="find-regex">
+                                .*
+                            </label>
+                            <button class="find-btn find-close" id="find-close" title="Close (Esc)">✕</button>
+                        </div>
+                    </div>
+                    <div id="replace-row">
+                        <div class="find-input-wrapper">
+                            <span class="find-icon">↔️</span>
+                            <input type="text" id="replace-input" placeholder="Replace with....">
+                        </div>
+                        <div class="find-buttons">
+                            <button class="find-btn replace-btn" id="replace-one" title="Replace">Replace</button>
+                            <button class="find-btn replace-btn" id="replace-all" title="Replace All">All</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="editor-content">
+                    <div id="no-file">
+                        <p>📝</p>
+                        <p>Open a file to start editing</p>
+                    </div>
+                    <textarea id="editor"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Console Panel with Problems Tab -->
+        <div id="console-panel">
+            <div id="console-header">
+                <div id="console-tabs">
+                    <button class="console-tab active" data-tab="console">
+                        💻 Console
+                    </button>
+                    <button class="console-tab" data-tab="problems">
+                        ⚠️ Problems
+                        <span class="console-tab-badge" id="problems-badge" style="display: none;">0</span>
+                    </button>
+                    <button class="console-tab" data-tab="terminal">
+                        >_ Terminal
+                    </button>
+                </div>
+                <div id="console-actions">
+                    <button id="btn-clear-console" title="Clear">🗑️</button>
+                    <button id="btn-close-console" title="Close">✖️</button>
+                </div>
+            </div>
+
+            <!-- Console Content -->
+            <div class="console-content active" id="console-content" data-tab="console">
+                <div id="console-output"></div>
+                <div id="console-input-container">
+                    <span id="console-prompt">$</span>
+                    <input type="text" id="console-input" placeholder="Enter command...">
+                </div>
+            </div>
+
+            <!-- Problems Content -->
+            <div class="console-content" id="problems-content" data-tab="problems">
+                <div id="problems-toolbar">
+                    <div class="problems-filter">
+                        <input type="checkbox" id="filter-errors" checked>
+                        <label for="filter-errors">Errors</label>
+                    </div>
+                    <div class="problems-filter">
+                        <input type="checkbox" id="filter-warnings" checked>
+                        <label for="filter-warnings">Warnings</label>
+                    </div>
+                    <div class="problems-filter">
+                        <input type="checkbox" id="filter-info" checked>
+                        <label for="filter-info">Info</label>
+                    </div>
+                    <div style="flex: 1;"></div>
+                    <div class="problems-count">
+                        <span class="problems-count-error" id="error-count">0 Errors</span>
+                        <span class="problems-count-warning" id="warning-count">0 Warnings</span>
+                        <span class="problems-count-info" id="info-count">0 Info</span>
+                    </div>
+                </div>
+                <div id="problems-list">
+                    <div id="no-problems">
+                        <div id="no-problems-icon">✅</div>
+                        <div>No problems detected</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terminal Content -->
+            <div class="console-content" id="terminal-content" data-tab="terminal">
+                <div id="terminal-output"></div>
+                <div id="console-input-container">
+                    <span id="console-prompt">$</span>
+                    <input type="text" id="terminal-input" placeholder="Enter command...">
+                </div>
+            </div>
+        </div>
+
+        <div id="status-bar">
+            <span class="status-item status-problems" id="status-problems" title="Click to show problems">
+                <span class="status-error-count">⊗ 0</span>
+                <span class="status-warning-count">⚠ 0</span>
+            </span>
+            <span class="status-item" id="status-file">No file</span>
+            <span class="status-item" id="status-pos">Ln 1, Col 1</span>
+            <span class="status-item" id="status-lang">Plain Text</span>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div id="context-menu">
+        <div class="context-menu-item" id="ctx-new-file">
+            <span class="context-menu-icon">📄</span>New File
+        </div>
+        <div class="context-menu-item" id="ctx-new-folder">
+            <span class="context-menu-icon">📁</span>New Folder
+        </div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" id="ctx-rename">
+            <span class="context-menu-icon">✏️</span>Rename
+        </div>
+        <div class="context-menu-item" id="ctx-delete">
+            <span class="context-menu-icon">🗑️</span>Delete
+        </div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" id="ctx-copy-path">
+            <span class="context-menu-icon">📋</span>Copy Path
+        </div>
+    </div>
+
+    <!-- Recent Project Context Menu -->
+    <div id="recent-context-menu">
+        <div class="context-menu-item" id="ctx-recent-open">
+            <span class="context-menu-icon">📂</span>Open Project
+        </div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" id="ctx-recent-copy-path">
+            <span class="context-menu-icon">📋</span>Copy Full Path of Project
+        </div>
+        <div class="context-menu-item" id="ctx-recent-open-explorer">
+            <span class="context-menu-icon">🗂️</span>Open Project in File Explorer
+        </div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" id="ctx-recent-delete">
+            <span class="context-menu-icon">🗑️</span>Delete Project
+        </div>
+    </div>
+
+    <!-- Input Dialog -->
+    <div id="input-dialog">
+        <div id="input-dialog-box">
+            <div id="input-dialog-header">
+                <div id="input-dialog-title">Enter name</div>
+            </div>
+            <div id="input-dialog-content">
+                <input type="text" id="input-dialog-input">
+            </div>
+            <div id="input-dialog-buttons">
+                <button class="input-dialog-btn input-dialog-btn-cancel" id="input-dialog-cancel">Cancel</button>
+                <button class="input-dialog-btn input-dialog-btn-ok" id="input-dialog-ok">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CodeMirror Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/clike/clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/markdown/markdown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/yaml/yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/properties/properties.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/show-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/javascript-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closebrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/matchbrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/anyword-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/search/searchcursor.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/scroll/annotatescrollbar.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/search/matchesonscrollbar.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/search/match-highlighter.min.js"></script>
+    
+    <script>
+        const fs = require('fs');
+        const path = require('path');
+        const { ipcRenderer } = require('electron');
+
+        // ==================== GLOBAL STATE ====================
+        let editor = null;
+        let currentFolder = null;
+        let currentFile = null;
+        let openTabs = [];
+        let contextMenuTarget = null;
+        let selectedProjectType = null;
+        let recentProjects = [];
+        let problems = [];
+        let currentConsoleTab = 'console';
+        let recentContextTarget = null;
+
+        // Load recent projects
+        try {
+            const stored = localStorage.getItem('xenoeditor-recent');
+            if (stored) recentProjects = JSON.parse(stored);
+        } catch(e) {}
+
+        // ==================== EDITOR INIT ====================
+        editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
+            lineNumbers: true,
+            mode: 'javascript',
+            theme: 'dracula',
+            indentUnit: 4,
+            indentWithTabs: false,
+            matchBrackets: true,
+            autoCloseBrackets: true,
+            lineWrapping: false,
+            extraKeys: {
+                "Ctrl-Space": "autocomplete",
+                "Ctrl-S": () => saveCurrentFile(),
+                "Tab": (cm) => {
+                    if (cm.somethingSelected()) {
+                        cm.indentSelection("add");
+                    } else {
+                        cm.replaceSelection("    ");
+                    }
+                }
+            }
+        });
+
+        editor.on('cursorActivity', () => {
+            const cursor = editor.getCursor();
+            document.getElementById('status-pos').textContent = `Ln ${cursor.line + 1}, Col ${cursor.ch + 1}`;
+        });
+        
+        const javaImports = {
+    // Bukkit/Spigot
+    'org.bukkit': [
+        'org.bukkit.Bukkit',
+        'org.bukkit.ChatColor',
+        'org.bukkit.Material',
+        'org.bukkit.Sound',
+        'org.bukkit.GameMode',
+        'org.bukkit.Location',
+        'org.bukkit.World',
+        'org.bukkit.Particle',
+        'org.bukkit.NamespacedKey',
+        'org.bukkit.Keyed'
+    ],
+    'org.bukkit.plugin': [
+        'org.bukkit.plugin.java.JavaPlugin',
+        'org.bukkit.plugin.Plugin',
+        'org.bukkit.plugin.PluginManager',
+        'org.bukkit.plugin.PluginDescriptionFile'
+    ],
+    'org.bukkit.entity': [
+        'org.bukkit.entity.Player',
+        'org.bukkit.entity.Entity',
+        'org.bukkit.entity.LivingEntity',
+        'org.bukkit.entity.Creature',
+        'org.bukkit.entity.Monster',
+        'org.bukkit.entity.Animals',
+        'org.bukkit.entity.ArmorStand',
+        'org.bukkit.entity.Arrow',
+        'org.bukkit.entity.Projectile',
+        'org.bukkit.entity.Item',
+        'org.bukkit.entity.ExperienceOrb',
+        'org.bukkit.entity.Villager',
+        'org.bukkit.entity.Zombie',
+        'org.bukkit.entity.Skeleton',
+        'org.bukkit.entity.Creeper',
+        'org.bukkit.entity.Spider',
+        'org.bukkit.entity.Enderman',
+        'org.bukkit.entity.Wolf',
+        'org.bukkit.entity.Pig',
+        'org.bukkit.entity.Cow',
+        'org.bukkit.entity.Sheep',
+        'org.bukkit.entity.Chicken',
+        'org.bukkit.entity.Horse',
+        'org.bukkit.entity.Boat',
+        'org.bukkit.entity.Minecart',
+        'org.bukkit.entity.TNTPrimed',
+        'org.bukkit.entity.Fireball',
+        'org.bukkit.entity.EnderDragon',
+        'org.bukkit.entity.Wither',
+        'org.bukkit.entity.EntityType'
+    ],
+    'org.bukkit.event': [
+        'org.bukkit.event.Listener',
+        'org.bukkit.event.EventHandler',
+        'org.bukkit.event.EventPriority',
+        'org.bukkit.event.Cancellable',
+        'org.bukkit.event.Event'
+    ],
+    'org.bukkit.event.player': [
+        'org.bukkit.event.player.PlayerJoinEvent',
+        'org.bukkit.event.player.PlayerQuitEvent',
+        'org.bukkit.event.player.PlayerMoveEvent',
+        'org.bukkit.event.player.PlayerInteractEvent',
+        'org.bukkit.event.player.PlayerChatEvent',
+        'org.bukkit.event.player.AsyncPlayerChatEvent',
+        'org.bukkit.event.player.PlayerDeathEvent',
+        'org.bukkit.event.player.PlayerRespawnEvent',
+        'org.bukkit.event.player.PlayerTeleportEvent',
+        'org.bukkit.event.player.PlayerDropItemEvent',
+        'org.bukkit.event.player.PlayerPickupItemEvent',
+        'org.bukkit.event.player.PlayerItemHeldEvent',
+        'org.bukkit.event.player.PlayerToggleSprintEvent',
+        'org.bukkit.event.player.PlayerToggleSneakEvent',
+        'org.bukkit.event.player.PlayerCommandPreprocessEvent',
+        'org.bukkit.event.player.PlayerKickEvent',
+        'org.bukkit.event.player.PlayerLoginEvent',
+        'org.bukkit.event.player.PlayerPortalEvent',
+        'org.bukkit.event.player.PlayerBedEnterEvent',
+        'org.bukkit.event.player.PlayerBedLeaveEvent',
+        'org.bukkit.event.player.PlayerFishEvent',
+        'org.bukkit.event.player.PlayerExpChangeEvent',
+        'org.bukkit.event.player.PlayerLevelChangeEvent'
+    ],
+    'org.bukkit.event.block': [
+        'org.bukkit.event.block.BlockBreakEvent',
+        'org.bukkit.event.block.BlockPlaceEvent',
+        'org.bukkit.event.block.BlockDamageEvent',
+        'org.bukkit.event.block.BlockBurnEvent',
+        'org.bukkit.event.block.BlockIgniteEvent',
+        'org.bukkit.event.block.BlockExplodeEvent',
+        'org.bukkit.event.block.BlockFromToEvent',
+        'org.bukkit.event.block.BlockGrowEvent',
+        'org.bukkit.event.block.BlockRedstoneEvent',
+        'org.bukkit.event.block.SignChangeEvent'
+    ],
+    'org.bukkit.event.entity': [
+        'org.bukkit.event.entity.EntityDamageEvent',
+        'org.bukkit.event.entity.EntityDamageByEntityEvent',
+        'org.bukkit.event.entity.EntityDeathEvent',
+        'org.bukkit.event.entity.EntitySpawnEvent',
+        'org.bukkit.event.entity.EntityExplodeEvent',
+        'org.bukkit.event.entity.EntityTargetEvent',
+        'org.bukkit.event.entity.EntityInteractEvent',
+        'org.bukkit.event.entity.EntityCombustEvent',
+        'org.bukkit.event.entity.EntityRegainHealthEvent',
+        'org.bukkit.event.entity.EntityShootBowEvent',
+        'org.bukkit.event.entity.EntityTameEvent',
+        'org.bukkit.event.entity.CreatureSpawnEvent',
+        'org.bukkit.event.entity.ItemSpawnEvent',
+        'org.bukkit.event.entity.ProjectileHitEvent',
+        'org.bukkit.event.entity.ProjectileLaunchEvent',
+        'org.bukkit.event.entity.FoodLevelChangeEvent'
+    ],
+    'org.bukkit.event.inventory': [
+        'org.bukkit.event.inventory.InventoryClickEvent',
+        'org.bukkit.event.inventory.InventoryOpenEvent',
+        'org.bukkit.event.inventory.InventoryCloseEvent',
+        'org.bukkit.event.inventory.InventoryDragEvent',
+        'org.bukkit.event.inventory.InventoryMoveItemEvent',
+        'org.bukkit.event.inventory.InventoryPickupItemEvent',
+        'org.bukkit.event.inventory.CraftItemEvent',
+        'org.bukkit.event.inventory.FurnaceBurnEvent',
+        'org.bukkit.event.inventory.FurnaceSmeltEvent',
+        'org.bukkit.event.inventory.BrewEvent',
+        'org.bukkit.event.inventory.PrepareItemCraftEvent'
+    ],
+    'org.bukkit.event.server': [
+        'org.bukkit.event.server.PluginEnableEvent',
+        'org.bukkit.event.server.PluginDisableEvent',
+        'org.bukkit.event.server.ServerCommandEvent',
+        'org.bukkit.event.server.ServerListPingEvent'
+    ],
+    'org.bukkit.event.world': [
+        'org.bukkit.event.world.WorldLoadEvent',
+        'org.bukkit.event.world.WorldUnloadEvent',
+        'org.bukkit.event.world.WorldSaveEvent',
+        'org.bukkit.event.world.ChunkLoadEvent',
+        'org.bukkit.event.world.ChunkUnloadEvent',
+        'org.bukkit.event.world.SpawnChangeEvent',
+        'org.bukkit.event.world.StructureGrowEvent'
+    ],
+    'org.bukkit.event.weather': [
+        'org.bukkit.event.weather.WeatherChangeEvent',
+        'org.bukkit.event.weather.ThunderChangeEvent',
+        'org.bukkit.event.weather.LightningStrikeEvent'
+    ],
+    'org.bukkit.inventory': [
+        'org.bukkit.inventory.Inventory',
+        'org.bukkit.inventory.ItemStack',
+        'org.bukkit.inventory.PlayerInventory',
+        'org.bukkit.inventory.ItemFactory',
+        'org.bukkit.inventory.meta.ItemMeta',
+        'org.bukkit.inventory.meta.BookMeta',
+        'org.bukkit.inventory.meta.SkullMeta',
+        'org.bukkit.inventory.meta.PotionMeta',
+        'org.bukkit.inventory.meta.LeatherArmorMeta',
+        'org.bukkit.inventory.meta.FireworkMeta',
+        'org.bukkit.inventory.meta.EnchantmentStorageMeta',
+        'org.bukkit.inventory.ShapedRecipe',
+        'org.bukkit.inventory.ShapelessRecipe',
+        'org.bukkit.inventory.FurnaceRecipe',
+        'org.bukkit.inventory.EquipmentSlot'
+    ],
+    'org.bukkit.command': [
+        'org.bukkit.command.Command',
+        'org.bukkit.command.CommandSender',
+        'org.bukkit.command.CommandExecutor',
+        'org.bukkit.command.TabCompleter',
+        'org.bukkit.command.TabExecutor',
+        'org.bukkit.command.ConsoleCommandSender',
+        'org.bukkit.command.BlockCommandSender',
+        'org.bukkit.command.PluginCommand'
+    ],
+    'org.bukkit.configuration': [
+        'org.bukkit.configuration.Configuration',
+        'org.bukkit.configuration.ConfigurationSection',
+        'org.bukkit.configuration.file.FileConfiguration',
+        'org.bukkit.configuration.file.YamlConfiguration'
+    ],
+    'org.bukkit.scheduler': [
+        'org.bukkit.scheduler.BukkitScheduler',
+        'org.bukkit.scheduler.BukkitTask',
+        'org.bukkit.scheduler.BukkitRunnable'
+    ],
+    'org.bukkit.enchantments': [
+        'org.bukkit.enchantments.Enchantment',
+        'org.bukkit.enchantments.EnchantmentTarget'
+    ],
+    'org.bukkit.potion': [
+        'org.bukkit.potion.PotionEffect',
+        'org.bukkit.potion.PotionEffectType',
+        'org.bukkit.potion.PotionType',
+        'org.bukkit.potion.Potion'
+    ],
+    'org.bukkit.block': [
+        'org.bukkit.block.Block',
+        'org.bukkit.block.BlockState',
+        'org.bukkit.block.BlockFace',
+        'org.bukkit.block.Sign',
+        'org.bukkit.block.Chest',
+        'org.bukkit.block.Furnace',
+        'org.bukkit.block.Dispenser',
+        'org.bukkit.block.Hopper',
+        'org.bukkit.block.Dropper',
+        'org.bukkit.block.Beacon',
+        'org.bukkit.block.CommandBlock',
+        'org.bukkit.block.CreatureSpawner',
+        'org.bukkit.block.data.BlockData'
+    ],
+    'org.bukkit.scoreboard': [
+        'org.bukkit.scoreboard.Scoreboard',
+        'org.bukkit.scoreboard.ScoreboardManager',
+        'org.bukkit.scoreboard.Objective',
+        'org.bukkit.scoreboard.Score',
+        'org.bukkit.scoreboard.Team',
+        'org.bukkit.scoreboard.DisplaySlot',
+        'org.bukkit.scoreboard.Criterias'
+    ],
+    'org.bukkit.boss': [
+        'org.bukkit.boss.BossBar',
+        'org.bukkit.boss.BarColor',
+        'org.bukkit.boss.BarStyle',
+        'org.bukkit.boss.BarFlag'
+    ],
+    'org.bukkit.util': [
+        'org.bukkit.util.Vector',
+        'org.bukkit.util.EulerAngle',
+        'org.bukkit.util.BlockIterator',
+        'org.bukkit.util.BoundingBox'
+    ],
+    // Java Standard Library
+    'java.util': [
+        'java.util.List',
+        'java.util.ArrayList',
+        'java.util.LinkedList',
+        'java.util.Map',
+        'java.util.HashMap',
+        'java.util.LinkedHashMap',
+        'java.util.TreeMap',
+        'java.util.Set',
+        'java.util.HashSet',
+        'java.util.LinkedHashSet',
+        'java.util.TreeSet',
+        'java.util.Collection',
+        'java.util.Collections',
+        'java.util.Arrays',
+        'java.util.Iterator',
+        'java.util.Optional',
+        'java.util.UUID',
+        'java.util.Random',
+        'java.util.Date',
+        'java.util.Calendar',
+        'java.util.Timer',
+        'java.util.TimerTask',
+        'java.util.Scanner',
+        'java.util.Properties',
+        'java.util.Objects',
+        'java.util.Comparator',
+        'java.util.Queue',
+        'java.util.Deque',
+        'java.util.Stack',
+        'java.util.PriorityQueue',
+        'java.util.concurrent.ConcurrentHashMap',
+        'java.util.concurrent.CopyOnWriteArrayList',
+        'java.util.concurrent.ExecutorService',
+        'java.util.concurrent.Executors',
+        'java.util.concurrent.Future',
+        'java.util.concurrent.CompletableFuture',
+        'java.util.concurrent.atomic.AtomicInteger',
+        'java.util.concurrent.atomic.AtomicBoolean',
+        'java.util.stream.Stream',
+        'java.util.stream.Collectors',
+        'java.util.function.Function',
+        'java.util.function.Consumer',
+        'java.util.function.Predicate',
+        'java.util.function.Supplier',
+        'java.util.logging.Logger',
+        'java.util.logging.Level',
+        'java.util.regex.Pattern',
+        'java.util.regex.Matcher'
+    ],
+    'java.io': [
+        'java.io.File',
+        'java.io.InputStream',
+        'java.io.OutputStream',
+        'java.io.FileInputStream',
+        'java.io.FileOutputStream',
+        'java.io.BufferedReader',
+        'java.io.BufferedWriter',
+        'java.io.FileReader',
+        'java.io.FileWriter',
+        'java.io.InputStreamReader',
+        'java.io.OutputStreamWriter',
+        'java.io.PrintWriter',
+        'java.io.ByteArrayInputStream',
+        'java.io.ByteArrayOutputStream',
+        'java.io.IOException',
+        'java.io.FileNotFoundException',
+        'java.io.Serializable',
+        'java.io.ObjectInputStream',
+        'java.io.ObjectOutputStream'
+    ],
+    'java.nio': [
+        'java.nio.file.Path',
+        'java.nio.file.Paths',
+        'java.nio.file.Files',
+        'java.nio.file.StandardCopyOption',
+        'java.nio.charset.StandardCharsets',
+        'java.nio.ByteBuffer'
+    ],
+    'java.net': [
+        'java.net.URL',
+        'java.net.URI',
+        'java.net.HttpURLConnection',
+        'java.net.Socket',
+        'java.net.ServerSocket',
+        'java.net.InetAddress',
+        'java.net.URLEncoder',
+        'java.net.URLDecoder'
+    ],
+    'java.sql': [
+        'java.sql.Connection',
+        'java.sql.DriverManager',
+        'java.sql.Statement',
+        'java.sql.PreparedStatement',
+        'java.sql.ResultSet',
+        'java.sql.SQLException'
+    ],
+    'java.lang': [
+        'java.lang.String',
+        'java.lang.StringBuilder',
+        'java.lang.StringBuffer',
+        'java.lang.Integer',
+        'java.lang.Long',
+        'java.lang.Double',
+        'java.lang.Float',
+        'java.lang.Boolean',
+        'java.lang.Character',
+        'java.lang.Byte',
+        'java.lang.Short',
+        'java.lang.Math',
+        'java.lang.System',
+        'java.lang.Object',
+        'java.lang.Class',
+        'java.lang.Thread',
+        'java.lang.Runnable',
+        'java.lang.Exception',
+        'java.lang.RuntimeException',
+        'java.lang.NullPointerException',
+        'java.lang.IllegalArgumentException',
+        'java.lang.IllegalStateException',
+        'java.lang.IndexOutOfBoundsException',
+        'java.lang.Throwable',
+        'java.lang.Error',
+        'java.lang.Enum',
+        'java.lang.Comparable',
+        'java.lang.Iterable',
+        'java.lang.Override',
+        'java.lang.Deprecated',
+        'java.lang.SuppressWarnings',
+        'java.lang.FunctionalInterface',
+        'java.lang.reflect.Method',
+        'java.lang.reflect.Field',
+        'java.lang.reflect.Constructor'
+    ],
+    'java.text': [
+        'java.text.SimpleDateFormat',
+        'java.text.DateFormat',
+        'java.text.NumberFormat',
+        'java.text.DecimalFormat',
+        'java.text.MessageFormat'
+    ],
+    'java.time': [
+        'java.time.LocalDate',
+        'java.time.LocalTime',
+        'java.time.LocalDateTime',
+        'java.time.ZonedDateTime',
+        'java.time.Instant',
+        'java.time.Duration',
+        'java.time.Period',
+        'java.time.ZoneId',
+        'java.time.format.DateTimeFormatter'
+    ]
+};
+        
+
+// ==================== FIND & REPLACE ====================
+let searchCursor = null;
+let searchMatches = [];
+let currentMatchIndex = -1;
+let searchMarks = [];
+
+const findPanel = document.getElementById('find-panel');
+const findInput = document.getElementById('find-input');
+const replaceInput = document.getElementById('replace-input');
+const findCount = document.getElementById('find-count');
+const findCaseCheckbox = document.getElementById('find-case');
+const findRegexCheckbox = document.getElementById('find-regex');
+
+// Find opció checkbox-ok kezelése
+document.querySelectorAll('.find-option').forEach(option => {
+    option.addEventListener('click', (e) => {
+        if (e.target.tagName !== 'INPUT') {
+            const checkbox = option.querySelector('input');
+            checkbox.checked = !checkbox.checked;
+        }
+        option.classList.toggle('active', option.querySelector('input').checked);
+        performSearch();
+    });
+});
+
+function openFind(withReplace = false) {
+    findPanel.classList.add('open');
+    if (withReplace) {
+        findPanel.classList.add('replace-mode');
+    } else {
+        findPanel.classList.remove('replace-mode');
+    }
+    
+    // Ha van kijelölt szöveg, használjuk azt
+    const selection = editor.getSelection();
+    if (selection && selection.length < 100) {
+        findInput.value = selection;
+    }
+    
+    findInput.focus();
+    findInput.select();
+    performSearch();
+}
+
+function closeFind() {
+    findPanel.classList.remove('open');
+    findPanel.classList.remove('replace-mode');
+    clearSearchMarks();
+    findCount.textContent = '';
+    editor.focus();
+}
+
+function clearSearchMarks() {
+    searchMarks.forEach(mark => mark.clear());
+    searchMarks = [];
+}
+
+function performSearch() {
+    clearSearchMarks();
+    searchMatches = [];
+    currentMatchIndex = -1;
+    
+    const query = findInput.value;
+    if (!query) {
+        findCount.textContent = '';
+        findCount.classList.remove('no-results');
+        return;
+    }
+    
+    const caseSensitive = findCaseCheckbox.checked;
+    const isRegex = findRegexCheckbox.checked;
+    
+    let searchQuery;
+    try {
+        if (isRegex) {
+            searchQuery = new RegExp(query, caseSensitive ? 'g' : 'gi');
+        } else {
+            // Escape special regex characters for literal search
+            const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            searchQuery = new RegExp(escaped, caseSensitive ? 'g' : 'gi');
+        }
+    } catch (e) {
+        findCount.textContent = 'Invalid regex';
+        findCount.classList.add('no-results');
+        return;
+    }
+    
+    // Keresés az összes sorban
+    const doc = editor.getDoc();
+    const lineCount = doc.lineCount();
+    
+    for (let line = 0; line < lineCount; line++) {
+        const lineText = doc.getLine(line);
+        let match;
+        searchQuery.lastIndex = 0;
+        
+        while ((match = searchQuery.exec(lineText)) !== null) {
+            const from = { line: line, ch: match.index };
+            const to = { line: line, ch: match.index + match[0].length };
+            
+            searchMatches.push({ from, to });
+            
+            // Jelölés hozzáadása
+            const mark = doc.markText(from, to, {
+                className: 'cm-searching'
+            });
+            searchMarks.push(mark);
+            
+            // Végtelen ciklus elkerülése üres match esetén
+            if (match[0].length === 0) break;
+        }
+    }
+    
+    // Találatok számának megjelenítése
+    if (searchMatches.length === 0) {
+        findCount.textContent = 'No results';
+        findCount.classList.add('no-results');
+    } else {
+        findCount.textContent = `${searchMatches.length} found`;
+        findCount.classList.remove('no-results');
+        
+        // Ugrás az első találatra a kurzor pozíciójától
+        const cursor = editor.getCursor();
+        for (let i = 0; i < searchMatches.length; i++) {
+            const match = searchMatches[i];
+            if (match.from.line > cursor.line || 
+                (match.from.line === cursor.line && match.from.ch >= cursor.ch)) {
+                currentMatchIndex = i;
+                highlightCurrentMatch();
+                break;
+            }
+        }
+        
+        // Ha nem találtunk a kurzor után, ugrás az elsőre
+        if (currentMatchIndex === -1 && searchMatches.length > 0) {
+            currentMatchIndex = 0;
+            highlightCurrentMatch();
+        }
+    }
+}
+
+function highlightCurrentMatch() {
+    if (currentMatchIndex < 0 || currentMatchIndex >= searchMatches.length) return;
+    
+    // Előző current class eltávolítása
+    document.querySelectorAll('.cm-searching.current').forEach(el => {
+        el.classList.remove('current');
+    });
+    
+    const match = searchMatches[currentMatchIndex];
+    
+    // Scrollozás a találathoz
+    editor.scrollIntoView({ from: match.from, to: match.to }, 100);
+    
+    // Kurzor pozicionálása
+    editor.setSelection(match.from, match.to);
+    
+    // Frissítjük a mark-ot current class-al
+    clearSearchMarks();
+    const doc = editor.getDoc();
+    
+    searchMatches.forEach((m, index) => {
+        const className = index === currentMatchIndex ? 'cm-searching current' : 'cm-searching';
+        const mark = doc.markText(m.from, m.to, { className });
+        searchMarks.push(mark);
+    });
+    
+    // Számláló frissítése
+    findCount.textContent = `${currentMatchIndex + 1} of ${searchMatches.length}`;
+    findCount.classList.remove('no-results');
+}
+
+function findNext() {
+    if (searchMatches.length === 0) {
+        performSearch();
+        return;
+    }
+    
+    currentMatchIndex++;
+    if (currentMatchIndex >= searchMatches.length) {
+        currentMatchIndex = 0; // Körbe megy
+    }
+    highlightCurrentMatch();
+}
+
+function findPrev() {
+    if (searchMatches.length === 0) {
+        performSearch();
+        return;
+    }
+    
+    currentMatchIndex--;
+    if (currentMatchIndex < 0) {
+        currentMatchIndex = searchMatches.length - 1; // Körbe megy
+    }
+    highlightCurrentMatch();
+}
+
+function replaceOne() {
+    if (currentMatchIndex < 0 || currentMatchIndex >= searchMatches.length) return;
+    
+    const match = searchMatches[currentMatchIndex];
+    const replaceText = replaceInput.value;
+    
+    editor.replaceRange(replaceText, match.from, match.to);
+    
+    // Újra keresés
+    performSearch();
+    
+    // Ha van még találat, ugorj a következőre
+    if (searchMatches.length > 0) {
+        if (currentMatchIndex >= searchMatches.length) {
+            currentMatchIndex = 0;
+        }
+        highlightCurrentMatch();
+    }
+}
+
+function replaceAll() {
+    if (searchMatches.length === 0) return;
+    
+    const replaceText = replaceInput.value;
+    const count = searchMatches.length;
+    
+    // Hátulról előre cseréljük, hogy a pozíciók ne csússzanak el
+    editor.operation(() => {
+        for (let i = searchMatches.length - 1; i >= 0; i--) {
+            const match = searchMatches[i];
+            editor.replaceRange(replaceText, match.from, match.to);
+        }
+    });
+    
+    performSearch();
+    showToast(`Replaced ${count} occurrence${count > 1 ? 's' : ''}`, 'success');
+}
+
+// Event listeners
+findInput.addEventListener('input', () => {
+    performSearch();
+});
+
+findInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        if (e.shiftKey) {
+            findPrev();
+        } else {
+            findNext();
+        }
+    } else if (e.key === 'Escape') {
+        closeFind();
+    }
+});
+
+replaceInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        if (e.shiftKey) {
+            replaceAll();
+        } else {
+            replaceOne();
+        }
+    } else if (e.key === 'Escape') {
+        closeFind();
+    }
+});
+
+document.getElementById('find-next').onclick = findNext;
+document.getElementById('find-prev').onclick = findPrev;
+document.getElementById('find-close').onclick = closeFind;
+document.getElementById('replace-one').onclick = replaceOne;
+document.getElementById('replace-all').onclick = replaceAll;
+
+// Keyboard shortcuts - módosítsd a meglévő keydown listener-t
+document.addEventListener('keydown', (e) => {
+    // Ctrl+F - Find
+    if (e.ctrlKey && e.key === 'f') {
+        e.preventDefault();
+        openFind(false);
+    }
+    
+    // Ctrl+H - Find & Replace
+    if (e.ctrlKey && e.key === 'h') {
+        e.preventDefault();
+        openFind(true);
+    }
+    
+    // F3 - Find Next
+    if (e.key === 'F3' && findPanel.classList.contains('open')) {
+        e.preventDefault();
+        if (e.shiftKey) {
+            findPrev();
+        } else {
+            findNext();
+        }
+    }
+    
+    // Escape - Close find panel
+    if (e.key === 'Escape' && findPanel.classList.contains('open')) {
+        closeFind();
+    }
+    
+    // Meglévő shortcuts...
+    if (e.ctrlKey && e.key === 's') { 
+        e.preventDefault(); 
+        saveCurrentFile(); 
+    }
+    if (e.key === 'F5') { 
+        e.preventDefault(); 
+        document.getElementById('btn-run').click(); 
+    }
+    if (e.ctrlKey && e.key === 'b') { 
+        e.preventDefault(); 
+        document.getElementById('btn-build').click(); 
+    }
+    if (e.ctrlKey && e.key === '`') {
+        e.preventDefault();
+        toggleConsole();
+    }
+    if (e.ctrlKey && e.shiftKey && e.key === 'M') {
+        e.preventDefault();
+        openConsole();
+        switchConsoleTab('problems');
+    }
+    if (e.ctrlKey && e.shiftKey && e.key === 'P') {
+        e.preventDefault();
+        document.getElementById('btn-analyze').click();
+    }
+});
+// Összes import egy listába
+function getAllImports() {
+    const all = [];
+    for (const category in javaImports) {
+        all.push(...javaImports[category]);
+    }
+    return all;
+}
+
+// Custom Java hint function
+function javaImportHint(cm) {
+    const cursor = cm.getCursor();
+    const line = cm.getLine(cursor.line);
+    const end = cursor.ch;
+    let start = end;
+    
+    // Ellenőrizzük, hogy import sorban vagyunk-e
+    const trimmedLine = line.trim();
+    const isImportLine = trimmedLine.startsWith('import ');
+    
+    // Visszafelé keresés
+    while (start > 0 && /[\w\.]/.test(line.charAt(start - 1))) {
+        start--;
+    }
+    
+    const word = line.slice(start, end).toLowerCase();
+    
+    if (word.length < 1) {
+        return null;
+    }
+    
+    const completions = [];
+    
+    // Ha import sorban vagyunk, csak importokat javasolunk
+    if (isImportLine) {
+        const allImports = getAllImports();
+        allImports.forEach(imp => {
+            if (imp.toLowerCase().includes(word)) {
+                // Csak az osztály neve kell az import után
+                const className = imp.split('.').pop();
+                const matchStart = imp.toLowerCase().indexOf(word);
+                
+                completions.push({
+                    text: imp + ';',
+                    displayText: imp,
+                    className: 'completion-import',
+                    // Rendezéshez: pontos egyezés előre
+                    priority: matchStart === 0 ? 0 : (imp.toLowerCase().startsWith(word) ? 1 : 2)
+                });
+            }
+        });
+    } else {
+        // Normál kód - anyword hint
+        return CodeMirror.hint.anyword(cm);
+    }
+    
+    if (completions.length === 0) {
+        return null;
+    }
+    
+    // Rendezés prioritás szerint
+    completions.sort((a, b) => {
+        if (a.priority !== b.priority) return a.priority - b.priority;
+        return a.displayText.length - b.displayText.length;
+    });
+    
+    return {
+        list: completions.slice(0, 20),
+        from: CodeMirror.Pos(cursor.line, start),
+        to: CodeMirror.Pos(cursor.line, end)
+    };
+}
+
+// Regisztráljuk a Java hint-et
+CodeMirror.registerHelper('hint', 'java', javaImportHint);
+
+// Autocomplete gépelés közben
+let autocompleteTimeout = null;
+editor.on('inputRead', (cm, change) => {
+    if (change.origin !== '+input') return;
+    if (!/[\w\.]/.test(change.text[0])) return;
+    
+    clearTimeout(autocompleteTimeout);
+    autocompleteTimeout = setTimeout(() => {
+        const cursor = cm.getCursor();
+        const line = cm.getLine(cursor.line);
+        let start = cursor.ch;
+        
+        while (start > 0 && /[\w\.]/.test(line.charAt(start - 1))) {
+            start--;
+        }
+        
+        const word = line.slice(start, cursor.ch);
+        
+        if (word.length >= 2) {
+            const mode = cm.getOption('mode');
+            
+            if (mode === 'text/x-java') {
+                cm.showHint({
+                        hint: javaImportHint,
+                        completeSingle: false,
+                        closeOnUnfocus: true
+                        });
+                    } else {
+                        cm.showHint({
+                            completeSingle: false,
+                            closeOnUnfocus: true
+                        });
+                    }
+                }
+            }, 200);
+        });
+
+        // ==================== TOAST NOTIFICATION ====================
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast-notification ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+
+        // ==================== WELCOME SCREEN ====================
+        function showWelcome() {
+            document.getElementById('welcome-screen').style.display = 'flex';
+            document.getElementById('app-container').classList.remove('active');
+            renderRecentProjects();
+        }
+
+        function hideWelcome() {
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('app-container').classList.add('active');
+        }
+
+        function renderRecentProjects() {
+            const container = document.getElementById('recent-projects-list');
+            if (recentProjects.length === 0) {
+                container.innerHTML = '<p style="color: #666; font-size: 12px;">No recent projects</p>';
+                return;
+            }
+            container.innerHTML = '';
+            recentProjects.slice(0, 5).forEach(p => {
+                const item = document.createElement('div');
+                item.className = 'recent-item';
+                item.innerHTML = `
+                    <span class="recent-item-icon">📁</span>
+                    <div class="recent-item-info">
+                        <h4>${p.name}</h4>
+                        <p>${p.path}</p>
+                    </div>
+                `;
+                item.onclick = () => openProject(p.path);
+                
+                // Jobb klikk kezelés
+                item.oncontextmenu = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    recentContextTarget = p;
+                    showRecentContextMenu(e);
+                };
+                
+                container.appendChild(item);
+            });
+        }
+
+        function addRecentProject(projectPath) {
+            const name = path.basename(projectPath);
+            recentProjects = recentProjects.filter(p => p.path !== projectPath);
+            recentProjects.unshift({ name, path: projectPath });
+            recentProjects = recentProjects.slice(0, 10);
+            localStorage.setItem('xenoeditor-recent', JSON.stringify(recentProjects));
+        }
+
+        function removeFromRecentProjects(projectPath) {
+            recentProjects = recentProjects.filter(p => p.path !== projectPath);
+            localStorage.setItem('xenoeditor-recent', JSON.stringify(recentProjects));
+            renderRecentProjects();
+        }
+
+        function openProject(folderPath) {
+            if (!fs.existsSync(folderPath)) {
+                alert('Project folder not found!');
+                removeFromRecentProjects(folderPath);
+                return;
+            }
+            currentFolder = folderPath;
+            addRecentProject(folderPath);
+            loadFolder(folderPath);
+            hideWelcome();
+            document.getElementById('project-label').textContent = path.basename(folderPath);
+            
+            // Clear problems when opening new project
+            problems = [];
+            updateProblemsUI();
+            
+            // Auto-analyze
+            setTimeout(() => analyzeProject(), 500);
+        }
+
+        // ==================== RECENT PROJECT CONTEXT MENU ====================
+        function showRecentContextMenu(e) {
+            const menu = document.getElementById('recent-context-menu');
+            menu.style.display = 'block';
+            menu.style.left = e.pageX + 'px';
+            menu.style.top = e.pageY + 'px';
+        }
+
+        function hideRecentContextMenu() {
+            document.getElementById('recent-context-menu').style.display = 'none';
+        }
+
+        // Recent context menu item handlers
+        document.getElementById('ctx-recent-open').onclick = () => {
+            hideRecentContextMenu();
+            if (recentContextTarget) {
+                openProject(recentContextTarget.path);
+            }
+        };
+
+        document.getElementById('ctx-recent-copy-path').onclick = () => {
+            hideRecentContextMenu();
+            if (recentContextTarget) {
+                navigator.clipboard.writeText(recentContextTarget.path);
+                showToast('Path copied to clipboard!');
+            }
+        };
+
+        document.getElementById('ctx-recent-open-explorer').onclick = async () => {
+            hideRecentContextMenu();
+            if (recentContextTarget) {
+                const result = await ipcRenderer.invoke('open-in-explorer', recentContextTarget.path);
+                if (!result.success) {
+                    alert('Could not open folder: ' + (result.error || 'Folder may not exist'));
+                }
+            }
+        };
+
+        document.getElementById('ctx-recent-delete').onclick = async () => {
+            hideRecentContextMenu();
+            if (recentContextTarget) {
+                const confirmDelete = confirm(
+                    `Are you sure you want to DELETE this project?\n\n` +
+                    `Project: ${recentContextTarget.name}\n` +
+                    `Path: ${recentContextTarget.path}\n\n` +
+                    `⚠️ This will permanently delete ALL files in this folder!`
+                );
+                
+                if (confirmDelete) {
+                    const doubleConfirm = confirm(
+                        `⚠️ FINAL WARNING ⚠️\n\n` +
+                        `This action CANNOT be undone!\n` +
+                        `All files in "${recentContextTarget.name}" will be permanently deleted.\n\n` +
+                        `Are you absolutely sure?`
+                    );
+                    
+                    if (doubleConfirm) {
+                        const result = await ipcRenderer.invoke('delete-project-from-disk', recentContextTarget.path);
+                        if (result.success) {
+                            removeFromRecentProjects(recentContextTarget.path);
+                            showToast('Project deleted successfully', 'success');
+                        } else {
+                            alert('Failed to delete project: ' + result.error);
+                        }
+                    }
+                }
+            }
+        };
+
+        // Welcome card clicks
+        document.getElementById('card-new-project').onclick = () => {
+            document.getElementById('new-project-wizard').style.display = 'flex';
+            document.getElementById('project-name').value = '';
+            document.getElementById('project-location').value = '';
+            selectedProjectType = null;
+            document.querySelectorAll('.wizard-type-card').forEach(c => c.classList.remove('selected'));
+            document.getElementById('mc-options').classList.remove('visible');
+            updateCreateButton();
+        };
+
+        document.getElementById('card-open-project').onclick = async () => {
+            const folderPath = await ipcRenderer.invoke('open-folder-dialog');
+            if (folderPath) openProject(folderPath);
+        };
+
+        document.getElementById('btn-home').onclick = showWelcome;
+
+        // ==================== NEW PROJECT WIZARD ====================
+        document.querySelectorAll('.wizard-type-card').forEach(card => {
+            card.onclick = () => {
+                document.querySelectorAll('.wizard-type-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedProjectType = card.dataset.type;
+
+                const mcOptions = document.getElementById('mc-options');
+                const modLoaderField = document.getElementById('mod-loader-field');
+
+                if (selectedProjectType === 'minecraft-plugin' || selectedProjectType === 'minecraft-mod') {
+                    mcOptions.classList.add('visible');
+                    modLoaderField.style.display = selectedProjectType === 'minecraft-mod' ? 'block' : 'none';
+                } else {
+                    mcOptions.classList.remove('visible');
+                }
+                updateCreateButton();
+            };
+        });
+
+        document.getElementById('browse-btn').onclick = async () => {
+            const folderPath = await ipcRenderer.invoke('open-folder-dialog');
+            if (folderPath) {
+                document.getElementById('project-location').value = folderPath;
+                updateCreateButton();
+            }
+        };
+
+        document.getElementById('project-name').oninput = updateCreateButton;
+
+        function updateCreateButton() {
+            const name = document.getElementById('project-name').value.trim();
+            const location = document.getElementById('project-location').value.trim();
+            document.getElementById('wizard-create').disabled = !selectedProjectType || !name || !location;
+        }
+
+        document.getElementById('wizard-cancel').onclick = () => {
+            document.getElementById('new-project-wizard').style.display = 'none';
+        };
+
+        document.getElementById('wizard-create').onclick = async () => {
+            const projectData = {
+                name: document.getElementById('project-name').value.trim(),
+                location: document.getElementById('project-location').value.trim(),
+                type: selectedProjectType,
+                mcVersion: document.getElementById('mc-version').value,
+                modLoader: document.getElementById('mod-loader').value
+            };
+
+            consoleLog('info', `Creating ${projectData.type} project: ${projectData.name}...`);
+            openConsole();
+            switchConsoleTab('console');
+
+            const result = await ipcRenderer.invoke('create-project', projectData);
+
+            if (result.success) {
+                consoleLog('info', `✓ Project created successfully!`);
+                consoleLog('info', `  Location: ${result.path}`);
+                document.getElementById('new-project-wizard').style.display = 'none';
+                openProject(result.path);
+            } else {
+                consoleLog('stderr', `✗ Failed to create project: ${result.error}`);
+                alert('Failed to create project: ' + result.error);
+            }
+        };
+
+        // ==================== CONSOLE & PROBLEMS ====================
+        function openConsole() {
+            document.getElementById('console-panel').classList.add('open');
+        }
+
+        function closeConsole() {
+            document.getElementById('console-panel').classList.remove('open');
+        }
+
+        function toggleConsole() {
+            document.getElementById('console-panel').classList.toggle('open');
+        }
+
+        function switchConsoleTab(tabName) {
+            currentConsoleTab = tabName;
+            
+            // Update tab buttons
+            document.querySelectorAll('.console-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === tabName);
+            });
+            
+            // Update content
+            document.querySelectorAll('.console-content').forEach(content => {
+                content.classList.toggle('active', content.dataset.tab === tabName);
+            });
+        }
+
+        // Console tab clicks
+        document.querySelectorAll('.console-tab').forEach(tab => {
+            tab.onclick = () => switchConsoleTab(tab.dataset.tab);
+        });
+
+        function consoleLog(type, message) {
+            const output = document.getElementById('console-output');
+            const line = document.createElement('div');
+            line.className = `console-line ${type}`;
+            
+            // Add timestamp
+            const now = new Date();
+            const timestamp = `[${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}]`;
+            
+            if (type === 'command') {
+                line.textContent = message;
+            } else {
+                line.textContent = `${timestamp} ${message}`;
+            }
+            
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearConsole() {
+            document.getElementById('console-output').innerHTML = '';
+        }
+
+        document.getElementById('btn-terminal').onclick = toggleConsole;
+        document.getElementById('btn-close-console').onclick = closeConsole;
+        document.getElementById('btn-clear-console').onclick = () => {
+            if (currentConsoleTab === 'console') {
+                clearConsole();
+            } else if (currentConsoleTab === 'problems') {
+                problems = [];
+                updateProblemsUI();
+            } else if (currentConsoleTab === 'terminal') {
+                document.getElementById('terminal-output').innerHTML = '';
+            }
+        };
+
+        // Console input
+        document.getElementById('console-input').onkeypress = async (e) => {
+            if (e.key === 'Enter') {
+                const input = e.target.value.trim();
+                if (!input) return;
+
+                consoleLog('command', `$ ${input}`);
+                e.target.value = '';
+
+                // Handle gradlew specially
+                let command = input;
+                if (input.startsWith('gradlew') || input === 'gradlew') {
+                    command = process.platform === 'win32' ? input : './' + input;
+                }
+
+                await ipcRenderer.invoke('run-command', command, currentFolder);
+            }
+        };
+
+        // Terminal input
+        document.getElementById('terminal-input').onkeypress = async (e) => {
+            if (e.key === 'Enter') {
+                const input = e.target.value.trim();
+                if (!input) return;
+
+                const termOutput = document.getElementById('terminal-output');
+                const line = document.createElement('div');
+                line.style.color = '#569cd6';
+                line.textContent = `$ ${input}`;
+                termOutput.appendChild(line);
+                e.target.value = '';
+
+                let command = input;
+                if (input.startsWith('gradlew') || input === 'gradlew') {
+                    command = process.platform === 'win32' ? input : './' + input;
+                }
+
+                await ipcRenderer.invoke('run-command', command, currentFolder);
+            }
+        };
+
+        // Listen for console output
+        ipcRenderer.on('console-output', (event, data) => {
+            consoleLog(data.type, data.data.trim());
+            
+            // Also add to terminal
+            const termOutput = document.getElementById('terminal-output');
+            const line = document.createElement('div');
+            line.style.color = data.type === 'stderr' ? '#f44747' : '#a9b7c6';
+            line.style.whiteSpace = 'pre-wrap';
+            line.textContent = data.data;
+            termOutput.appendChild(line);
+            termOutput.scrollTop = termOutput.scrollHeight;
+        });
+
+        // Listen for problems
+        ipcRenderer.on('problems-found', (event, newProblems) => {
+            // Add new problems (avoid duplicates)
+            newProblems.forEach(p => {
+                const exists = problems.some(existing => 
+                    existing.file === p.file && 
+                    existing.line === p.line && 
+                    existing.message === p.message
+                );
+                if (!exists) {
+                    problems.push(p);
+                }
+            });
+            updateProblemsUI();
+        });
+
+        // ==================== PROBLEMS TAB ====================
+        function updateProblemsUI() {
+            const errorCount = problems.filter(p => p.type === 'error').length;
+            const warningCount = problems.filter(p => p.type === 'warning').length;
+            const infoCount = problems.filter(p => p.type === 'info').length;
+            
+            // Update counts
+            document.getElementById('error-count').textContent = `${errorCount} Errors`;
+            document.getElementById('warning-count').textContent = `${warningCount} Warnings`;
+            document.getElementById('info-count').textContent = `${infoCount} Info`;
+            
+            // Update status bar
+            document.querySelector('.status-error-count').textContent = `⊗ ${errorCount}`;
+            document.querySelector('.status-warning-count').textContent = `⚠ ${warningCount}`;
+            
+            // Update badge
+            const badge = document.getElementById('problems-badge');
+            const total = errorCount + warningCount;
+            if (total > 0) {
+                badge.style.display = 'inline';
+                badge.textContent = total;
+                badge.className = 'console-tab-badge' + (errorCount > 0 ? '' : ' warning');
+            } else {
+                badge.style.display = 'none';
+            }
+            
+            // Render problems list
+            renderProblems();
+        }
+
+        function renderProblems() {
+            const list = document.getElementById('problems-list');
+            const noProblems = document.getElementById('no-problems');
+            
+            const showErrors = document.getElementById('filter-errors').checked;
+            const showWarnings = document.getElementById('filter-warnings').checked;
+            const showInfo = document.getElementById('filter-info').checked;
+            
+            const filteredProblems = problems.filter(p => {
+                if (p.type === 'error' && !showErrors) return false;
+                if (p.type === 'warning' && !showWarnings) return false;
+                if (p.type === 'info' && !showInfo) return false;
+                return true;
+            });
+            
+            if (filteredProblems.length === 0) {
+                list.innerHTML = '';
+                list.appendChild(noProblems);
+                noProblems.style.display = 'flex';
+                return;
+            }
+            
+            noProblems.style.display = 'none';
+            list.innerHTML = '';
+            
+            filteredProblems.forEach(problem => {
+                const item = document.createElement('div');
+                item.className = 'problem-item';
+                
+                const icon = problem.type === 'error' ? '⊗' : (problem.type === 'warning' ? '⚠' : 'ℹ');
+                const iconClass = problem.type;
+                
+                const fileName = problem.file ? path.basename(problem.file) : 'Unknown';
+                const relativePath = problem.file && currentFolder ? 
+                    path.relative(currentFolder, problem.file) : problem.file;
+                
+                item.innerHTML = `
+                    <span class="problem-icon ${iconClass}">${icon}</span>
+                    <div class="problem-details">
+                        <div class="problem-message">${escapeHtml(problem.message)}</div>
+                        <div class="problem-location">${escapeHtml(relativePath || fileName)}${problem.line ? `:${problem.line}` : ''}${problem.column ? `:${problem.column}` : ''}</div>
+                    </div>
+                    <span class="problem-source">${problem.source || ''}</span>
+                `;
+                
+                // Click to open file
+                item.onclick = () => {
+                    if (problem.file && fs.existsSync(problem.file)) {
+                        openFileByPath(problem.file, problem.line);
+                    }
+                };
+                
+                list.appendChild(item);
+            });
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text.replace(/&/g, '&amp;')
+                       .replace(/</g, '&lt;')
+                       .replace(/>/g, '&gt;')
+                       .replace(/"/g, '&quot;');
+        }
+
+        // Filter checkboxes
+        document.getElementById('filter-errors').onchange = renderProblems;
+        document.getElementById('filter-warnings').onchange = renderProblems;
+        document.getElementById('filter-info').onchange = renderProblems;
+
+        // Status bar problems click
+        document.getElementById('status-problems').onclick = () => {
+            openConsole();
+            switchConsoleTab('problems');
+        };
+
+        // Analyze project
+        async function analyzeProject() {
+            if (!currentFolder) return;
+            
+            consoleLog('info', 'Analyzing project for problems...');
+            
+            const result = await ipcRenderer.invoke('analyze-project', currentFolder);
+            
+            if (result && result.length > 0) {
+                result.forEach(p => {
+                    const exists = problems.some(existing => 
+                        existing.file === p.file && 
+                        existing.line === p.line && 
+                        existing.message === p.message
+                    );
+                    if (!exists) {
+                        problems.push(p);
+                    }
+                });
+                updateProblemsUI();
+                consoleLog('info', `Found ${result.length} issue(s)`);
+            } else {
+                consoleLog('info', 'No problems found');
+            }
+        }
+
+        document.getElementById('btn-analyze').onclick = () => {
+            problems = []; // Clear existing
+            updateProblemsUI();
+            analyzeProject();
+            openConsole();
+            switchConsoleTab('problems');
+        };
+
+        // ==================== TOOLBAR BUTTONS ====================
+        document.getElementById('btn-run').onclick = async () => {
+            if (!currentFolder) {
+                alert('No project open!');
+                return;
+            }
+            openConsole();
+            switchConsoleTab('console');
+            consoleLog('info', 'Running project...');
+            
+            // Clear problems before run
+            problems = [];
+            updateProblemsUI();
+
+            if (fs.existsSync(path.join(currentFolder, 'pom.xml'))) {
+                consoleLog('command', '$ mvn compile exec:java');
+                await ipcRenderer.invoke('run-command', 'mvn compile exec:java', currentFolder);
+            } else if (fs.existsSync(path.join(currentFolder, 'build.gradle'))) {
+                const cmd = process.platform === 'win32' ? 'gradlew.bat run' : './gradlew run';
+                consoleLog('command', `$ ${cmd}`);
+                await ipcRenderer.invoke('run-command', cmd, currentFolder);
+            } else if (fs.existsSync(path.join(currentFolder, 'package.json'))) {
+                consoleLog('command', '$ npm start');
+                await ipcRenderer.invoke('run-command', 'npm start', currentFolder);
+            } else if (fs.existsSync(path.join(currentFolder, 'main.py'))) {
+                consoleLog('command', '$ python main.py');
+                await ipcRenderer.invoke('run-command', 'python main.py', currentFolder);
+            } else {
+                consoleLog('stderr', 'Could not detect project type');
+            }
+        };
+
+        document.getElementById('btn-build').onclick = async () => {
+            if (!currentFolder) {
+                alert('No project open!');
+                return;
+            }
+            openConsole();
+            switchConsoleTab('console');
+            consoleLog('info', 'Building project...');
+            
+            // Clear problems before build
+            problems = [];
+            updateProblemsUI();
+
+            if (fs.existsSync(path.join(currentFolder, 'pom.xml'))) {
+                consoleLog('command', '$ mvn clean package');
+                await ipcRenderer.invoke('run-command', 'mvn clean package', currentFolder);
+            } else if (fs.existsSync(path.join(currentFolder, 'build.gradle'))) {
+                const cmd = process.platform === 'win32' ? 'gradlew.bat build' : './gradlew build';
+                consoleLog('command', `$ ${cmd}`);
+                await ipcRenderer.invoke('run-command', cmd, currentFolder);
+            } else if (fs.existsSync(path.join(currentFolder, 'package.json'))) {
+                consoleLog('command', '$ npm run build');
+                await ipcRenderer.invoke('run-command', 'npm run build', currentFolder);
+            } else {
+                consoleLog('stderr', 'Could not detect build system');
+            }
+        };
+
+        document.getElementById('btn-save').onclick = saveCurrentFile;
+        document.getElementById('btn-refresh').onclick = () => {
+            if (currentFolder) loadFolder(currentFolder);
+        };
+
+        document.getElementById('btn-new-file').onclick = () => {
+            if (currentFolder) {
+                createNewFile(currentFolder, true);
+            } else {
+                alert('Please open a project first');
+            }
+        };
+
+        // ==================== FILE TREE ====================
+let openFolders = new Set();
+
+function loadFolder(folderPath) {
+    const fileTree = document.getElementById('file-tree');
+    fileTree.innerHTML = '';
+
+    const folderName = path.basename(folderPath);
+    const rootItem = createFolderItem(folderName, folderPath, 0);
+    fileTree.appendChild(rootItem);
+
+    // Root mappa mindig nyitva
+    openFolders.add(folderPath);
+
+    const children = rootItem.querySelector('.tree-children');
+    if (children) {
+        children.style.display = 'block';
+        rootItem.querySelector('.tree-icon').textContent = '📂';
+    }
+}
+
+function createFolderItem(name, fullPath, level) {
+    const container = document.createElement('div');
+
+    const item = document.createElement('div');
+    item.className = 'tree-item tree-folder';
+    item.style.paddingLeft = (level * 15 + 8) + 'px';
+    item.dataset.path = fullPath;
+    
+    // Ellenőrizzük, hogy nyitva volt-e
+    const isOpen = openFolders.has(fullPath);
+    item.innerHTML = `<span class="tree-icon">${isOpen ? '📂' : '📁'}</span>${name}`;
+
+    const children = document.createElement('div');
+    children.className = 'tree-children';
+    children.style.display = isOpen ? 'block' : 'none';
+
+    item.onclick = (e) => {
+        e.stopPropagation();
+        const isCurrentlyOpen = children.style.display !== 'none';
+        
+        if (isCurrentlyOpen) {
+            children.style.display = 'none';
+            item.querySelector('.tree-icon').textContent = '📁';
+            openFolders.delete(fullPath);
+        } else {
+            children.style.display = 'block';
+            item.querySelector('.tree-icon').textContent = '📂';
+            openFolders.add(fullPath);
+        }
+    };
+
+    item.oncontextmenu = (e) => showContextMenu(e, fullPath, true);
+
+    container.appendChild(item);
+    container.appendChild(children);
+
+    try {
+        const items = fs.readdirSync(fullPath, { withFileTypes: true });
+        const filtered = items.filter(i => 
+            !i.name.startsWith('.') && 
+            i.name !== 'node_modules' && 
+            i.name !== 'target' && 
+            i.name !== 'build' &&
+            i.name !== '.gradle'
+        );
+
+        filtered.sort((a, b) => {
+            if (a.isDirectory() && !b.isDirectory()) return -1;
+            if (!a.isDirectory() && b.isDirectory()) return 1;
+            return a.name.localeCompare(b.name);
+        });
+
+        filtered.forEach(i => {
+            const itemPath = path.join(fullPath, i.name);
+            if (i.isDirectory()) {
+                children.appendChild(createFolderItem(i.name, itemPath, level + 1));
+            } else {
+                children.appendChild(createFileItem(i.name, itemPath, level + 1));
+            }
+        });
+    } catch (err) {
+        console.error('Error reading folder:', err);
+    }
+
+    return container;
+}
+
+        function createFileItem(name, fullPath, level) {
+            const item = document.createElement('div');
+            item.className = 'tree-item';
+            item.style.paddingLeft = (level * 15 + 8) + 'px';
+            item.innerHTML = `<span class="tree-icon">${getFileIcon(name)}</span>${name}`;
+
+            item.onclick = (e) => {
+                e.stopPropagation();
+                openFile(fullPath, item);
+            };
+
+            item.oncontextmenu = (e) => showContextMenu(e, fullPath, false);
+
+            return item;
+        }
+
+        function getFileIcon(filename) {
+            const ext = path.extname(filename).toLowerCase();
+            const icons = {
+                '.js': '📜', '.json': '⚙️', '.html': '🌐', '.css': '🎨',
+                '.md': '📝', '.txt': '📄', '.py': '🐍', '.java': '☕',
+                '.xml': '📋', '.yml': '📋', '.yaml': '📋', '.gradle': '🐘',
+                '.properties': '⚙️', '.toml': '⚙️', '.bat': '🖥️', '.sh': '🖥️'
+            };
+            return icons[ext] || '📄';
+        }
+
+        // ==================== FILE OPERATIONS ====================
+        function openFile(filePath, itemElement) {
+            document.querySelectorAll('.tree-item').forEach(el => el.classList.remove('selected'));
+            if (itemElement) itemElement.classList.add('selected');
+
+            const existingTab = openTabs.find(t => t.path === filePath);
+            if (existingTab) {
+                switchToTab(existingTab);
+                return;
+            }
+
+            try {
+                const content = fs.readFileSync(filePath, 'utf-8');
+                const ext = path.extname(filePath).toLowerCase();
+                const mode = getMode(ext);
+                const fileName = path.basename(filePath);
+
+                const tab = {
+                    path: filePath,
+                    name: fileName,
+                    content: content,
+                    mode: mode,
+                    icon: getFileIcon(fileName)
+                };
+
+                openTabs.push(tab);
+                renderTabs();
+                switchToTab(tab);
+
+                document.getElementById('no-file').style.display = 'none';
+            } catch (err) {
+                alert('Could not open file: ' + err.message);
+            }
+        }
+
+        function openFileByPath(filePath, lineNumber) {
+            openFile(filePath, null);
+            
+            // Go to line
+            if (lineNumber && lineNumber > 0) {
+                setTimeout(() => {
+                    editor.setCursor(lineNumber - 1, 0);
+                    editor.scrollIntoView({ line: lineNumber - 1, ch: 0 }, 100);
+                    editor.focus();
+                }, 100);
+            }
+        }
+
+        function renderTabs() {
+            const tabsHeader = document.getElementById('tabs-header');
+            tabsHeader.innerHTML = '';
+
+            openTabs.forEach(tab => {
+                const tabEl = document.createElement('div');
+                tabEl.className = 'tab' + (tab.path === currentFile ? ' active' : '');
+                tabEl.innerHTML = `
+                    <span class="tab-icon">${tab.icon}</span>
+                    <span>${tab.name}</span>
+                    <span class="tab-close">×</span>
+                `;
+
+                tabEl.onclick = (e) => {
+                    if (!e.target.classList.contains('tab-close')) {
+                        switchToTab(tab);
+                    }
+                };
+
+                tabEl.querySelector('.tab-close').onclick = (e) => {
+                    e.stopPropagation();
+                    closeTab(tab);
+                };
+
+                tabsHeader.appendChild(tabEl);
+            });
+        }
+
+        function switchToTab(tab) {
+            currentFile = tab.path;
+            editor.setValue(tab.content);
+            editor.setOption('mode', tab.mode);
+            editor.setCursor(0, 0);
+            editor.focus();
+
+            document.getElementById('status-file').textContent = tab.name;
+            document.getElementById('status-lang').textContent = getModeDisplayName(tab.mode);
+
+            renderTabs();
+        }
+
+        function getModeDisplayName(mode) {
+            const names = {
+                'javascript': 'JavaScript',
+                'text/x-java': 'Java',
+                'python': 'Python',
+                'htmlmixed': 'HTML',
+                'css': 'CSS',
+                'xml': 'XML',
+                'yaml': 'YAML',
+                'markdown': 'Markdown',
+                'properties': 'Properties',
+                'text/plain': 'Plain Text'
+            };
+            return names[mode] || mode;
+        }
+
+        function closeTab(tab) {
+            const index = openTabs.indexOf(tab);
+            if (index > -1) openTabs.splice(index, 1);
+
+            if (openTabs.length === 0) {
+                currentFile = null;
+                editor.setValue('');
+                document.getElementById('no-file').style.display = 'block';
+                document.getElementById('status-file').textContent = 'No file';
+                document.getElementById('status-lang').textContent = 'Plain Text';
+            } else if (tab.path === currentFile) {
+                switchToTab(openTabs[Math.max(0, index - 1)]);
+            }
+
+            renderTabs();
+        }
+
+        function saveCurrentFile() {
+            if (!currentFile) return;
+
+            try {
+                const content = editor.getValue();
+                fs.writeFileSync(currentFile, content, 'utf-8');
+
+                const tab = openTabs.find(t => t.path === currentFile);
+                if (tab) tab.content = content;
+
+                consoleLog('info', `Saved: ${path.basename(currentFile)}`);
+                showToast('File saved!', 'success');
+            } catch (err) {
+                alert('Could not save file: ' + err.message);
+            }
+        }
+
+        function getMode(ext) {
+            const modes = {
+                '.js': 'javascript', 
+                '.json': 'javascript', 
+                '.html': 'htmlmixed',
+                '.css': 'css', 
+                '.md': 'markdown', 
+                '.py': 'python',
+                '.java': 'text/x-java', 
+                '.xml': 'xml', 
+                '.yml': 'yaml',
+                '.yaml': 'yaml', 
+                '.properties': 'properties',
+                '.gradle': 'text/x-java',
+                '.toml': 'properties'
+            };
+            return modes[ext] || 'text/plain';
+        }
+
+        // ==================== CONTEXT MENU ====================
+        const contextMenu = document.getElementById('context-menu');
+
+        document.addEventListener('click', () => {
+            contextMenu.style.display = 'none';
+            hideRecentContextMenu();
+        });
+
+        function showContextMenu(e, itemPath, isFolder) {
+            e.preventDefault();
+            e.stopPropagation();
+            contextMenuTarget = { path: itemPath, isFolder };
+            contextMenu.style.display = 'block';
+            contextMenu.style.left = e.pageX + 'px';
+            contextMenu.style.top = e.pageY + 'px';
+        }
+
+        document.getElementById('ctx-new-file').onclick = () => {
+            contextMenu.style.display = 'none';
+            if (contextMenuTarget) createNewFile(contextMenuTarget.path, contextMenuTarget.isFolder);
+        };
+
+        document.getElementById('ctx-new-folder').onclick = () => {
+            contextMenu.style.display = 'none';
+            if (contextMenuTarget) createNewFolder(contextMenuTarget.path, contextMenuTarget.isFolder);
+        };
+
+        document.getElementById('ctx-rename').onclick = () => {
+            contextMenu.style.display = 'none';
+            if (contextMenuTarget) renameItem(contextMenuTarget.path);
+        };
+
+        document.getElementById('ctx-delete').onclick = () => {
+            contextMenu.style.display = 'none';
+            if (contextMenuTarget) deleteItem(contextMenuTarget.path);
+        };
+
+        document.getElementById('ctx-copy-path').onclick = () => {
+            contextMenu.style.display = 'none';
+            if (contextMenuTarget) {
+                navigator.clipboard.writeText(contextMenuTarget.path);
+                showToast('Path copied to clipboard');
+            }
+        };
+
+        // Input dialog
+        let inputDialogResolve = null;
+
+        function showInputDialog(title, defaultValue = '') {
+            return new Promise(resolve => {
+                inputDialogResolve = resolve;
+                document.getElementById('input-dialog-title').textContent = title;
+                document.getElementById('input-dialog-input').value = defaultValue;
+                document.getElementById('input-dialog').style.display = 'flex';
+                document.getElementById('input-dialog-input').focus();
+                document.getElementById('input-dialog-input').select();
+            });
+        }
+
+        document.getElementById('input-dialog-ok').onclick = () => {
+            const value = document.getElementById('input-dialog-input').value;
+            document.getElementById('input-dialog').style.display = 'none';
+            if (inputDialogResolve) { 
+                inputDialogResolve(value); 
+                inputDialogResolve = null; 
+            }
+        };
+
+        document.getElementById('input-dialog-cancel').onclick = () => {
+            document.getElementById('input-dialog').style.display = 'none';
+            if (inputDialogResolve) { 
+                inputDialogResolve(null); 
+                inputDialogResolve = null; 
+            }
+        };
+
+        document.getElementById('input-dialog-input').onkeypress = (e) => {
+            if (e.key === 'Enter') document.getElementById('input-dialog-ok').click();
+        };
+
+        document.getElementById('input-dialog').onkeydown = (e) => {
+            if (e.key === 'Escape') document.getElementById('input-dialog-cancel').click();
+        };
+
+        function createNewFile(targetPath, isFolder) {
+            showInputDialog('New file name:').then(fileName => {
+                if (!fileName) return;
+                const parentPath = isFolder ? targetPath : path.dirname(targetPath);
+                const newFilePath = path.join(parentPath, fileName);
+                try {
+                    if (fs.existsSync(newFilePath)) { 
+                        alert('File already exists!'); 
+                        return; 
+                    }
+                    fs.writeFileSync(newFilePath, '', 'utf-8');
+                    if (currentFolder) loadFolder(currentFolder);
+                    consoleLog('info', `Created: ${fileName}`);
+                    showToast(`Created: ${fileName}`, 'success');
+                } catch (err) { 
+                    alert('Error: ' + err.message); 
+                }
+            });
+        }
+
+        function createNewFolder(targetPath, isFolder) {
+            showInputDialog('New folder name:').then(folderName => {
+                if (!folderName) return;
+                const parentPath = isFolder ? targetPath : path.dirname(targetPath);
+                const newFolderPath = path.join(parentPath, folderName);
+                try {
+                    if (fs.existsSync(newFolderPath)) { 
+                        alert('Folder already exists!'); 
+                        return; 
+                    }
+                    fs.mkdirSync(newFolderPath);
+                    if (currentFolder) loadFolder(currentFolder);
+                    consoleLog('info', `Created folder: ${folderName}`);
+                    showToast(`Created folder: ${folderName}`, 'success');
+                } catch (err) { 
+                    alert('Error: ' + err.message); 
+                }
+            });
+        }
+
+        function renameItem(itemPath) {
+            const oldName = path.basename(itemPath);
+            showInputDialog('New name:', oldName).then(newName => {
+                if (!newName || newName === oldName) return;
+                const newPath = path.join(path.dirname(itemPath), newName);
+                try {
+                    fs.renameSync(itemPath, newPath);
+                    const tab = openTabs.find(t => t.path === itemPath);
+                    if (tab) { 
+                        tab.path = newPath; 
+                        tab.name = newName; 
+                        if (currentFile === itemPath) currentFile = newPath; 
+                        renderTabs(); 
+                    }
+                    if (currentFolder) loadFolder(currentFolder);
+                    consoleLog('info', `Renamed: ${oldName} → ${newName}`);
+                    showToast(`Renamed: ${oldName} → ${newName}`, 'success');
+                } catch (err) { 
+                    alert('Error: ' + err.message); 
+                }
+            });
+        }
+
+        function deleteItem(itemPath) {
+            const itemName = path.basename(itemPath);
+            if (!confirm(`Delete "${itemName}"?`)) return;
+            try {
+                const stats = fs.statSync(itemPath);
+                if (stats.isDirectory()) {
+                    fs.rmdirSync(itemPath, { recursive: true });
+                } else {
+                    fs.unlinkSync(itemPath);
+                }
+                const tab = openTabs.find(t => t.path === itemPath);
+                if (tab) closeTab(tab);
+                loadFolder(currentFolder);
+                consoleLog('info', `Deleted: ${itemName}`);
+                showToast(`Deleted: ${itemName}`, 'success');
+            } catch (err) { 
+                alert('Error: ' + err.message); 
+            }
+        }
+
+        // ==================== KEYBOARD SHORTCUTS ====================
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 's') { 
+                e.preventDefault(); 
+                saveCurrentFile(); 
+            }
+            if (e.key === 'F5') { 
+                e.preventDefault(); 
+                document.getElementById('btn-run').click(); 
+            }
+            if (e.ctrlKey && e.key === 'b') { 
+                e.preventDefault(); 
+                document.getElementById('btn-build').click(); 
+            }
+            if (e.ctrlKey && e.key === '`') {
+                e.preventDefault();
+                toggleConsole();
+            }
+            if (e.ctrlKey && e.shiftKey && e.key === 'M') {
+                e.preventDefault();
+                openConsole();
+                switchConsoleTab('problems');
+            }
+            if (e.ctrlKey && e.shiftKey && e.key === 'P') {
+                e.preventDefault();
+                document.getElementById('btn-analyze').click();
+            }
+        });
+
+        // ==================== IPC LISTENERS ====================
+        ipcRenderer.on('open-folder', (event, folderPath) => openProject(folderPath));
+        ipcRenderer.on('save-file', () => saveCurrentFile());
+        ipcRenderer.on('show-new-project', () => document.getElementById('card-new-project').click());
+        ipcRenderer.on('run-project', () => document.getElementById('btn-run').click());
+        ipcRenderer.on('build-project', () => document.getElementById('btn-build').click());
+        ipcRenderer.on('toggle-console', () => toggleConsole());
+        ipcRenderer.on('show-problems', () => {
+            openConsole();
+            switchConsoleTab('problems');
+        });
+        ipcRenderer.on('analyze-problems', () => {
+            document.getElementById('btn-analyze').click();
+        });
+        
+        // ==================== START ====================
+        showWelcome();
+    </script>
+</body>
+</html>
