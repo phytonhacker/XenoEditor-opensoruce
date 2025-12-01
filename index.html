@@ -455,10 +455,13 @@
         /* Sidebar */
         #sidebar {
             width: 280px;
+            min-width: 280px;
+            max-width: 280px;
             background: #3c3f41;
             border-right: 1px solid #323232;
             display: flex;
             flex-direction: column;
+            flex-shrink: 0;
         }
 
         #sidebar-header {
@@ -595,6 +598,90 @@
             flex: 1;
             position: relative;
             overflow: hidden;
+            display: flex;
+        }
+
+        #editor-main {
+            flex: 1;
+            position: relative;
+        }
+
+        /* ==================== MINIMAP ==================== */
+        #minimap-container {
+            width: 120px;
+            min-width: 120px;
+            max-width: 120px;
+            background: #1e1e1e;
+            border-left: 1px solid #323232;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        #minimap-container.hidden {
+            display: none;
+        }
+
+        #minimap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Consolas', monospace;
+            font-size: 1px;
+            line-height: 1px;
+            color: #666;
+            overflow-y: auto;
+            overflow-x: hidden;
+            cursor: pointer;
+            padding: 2px;
+        }
+
+        #minimap-viewport {
+            position: absolute;
+            background: rgba(90, 156, 249, 0.2);
+            border: 1px solid rgba(90, 156, 249, 0.5);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .minimap-line {
+            white-space: nowrap;
+            height: 1px;
+            overflow: hidden;
+            font-size: 1px;
+            line-height: 1px;
+            color: #666;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        .minimap-line:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .minimap-line.current {
+            background: rgba(90, 156, 249, 0.3);
+        }
+
+        /* Minimap toggle button */
+        #minimap-toggle {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #4a4d4e;
+            border: 1px solid #555;
+            color: #ccc;
+            padding: 3px 6px;
+            font-size: 10px;
+            cursor: pointer;
+            border-radius: 2px;
+            z-index: 20;
+        }
+
+        #minimap-toggle:hover {
+            background: #555;
         }
 
         #no-file {
@@ -604,6 +691,7 @@
             transform: translate(-50%, -50%);
             color: #666;
             text-align: center;
+            z-index: 5;
         }
 
         #no-file p:first-child {
@@ -1316,6 +1404,122 @@
             border-bottom: 1px solid #ffa500;
             opacity: 0.7;
         }
+        #editor-wrapper {
+            flex: 1;
+            display: none;
+            position: relative;
+            overflow: hidden;
+        }
+        #editor-weapper.visible {
+            display: flex;
+        }
+        #editor-wrapper .CodeMirror {
+            flex: 1;
+            height: 100 !important;
+        }
+        #minimap {
+            width: 100px;
+            background: #1e1e1e;
+            border-left: 1px solid #3c3f41;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        #minimap:hover {
+            background: #232323;
+        }
+        #minimap-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            pointer-events: none;
+            padding: 4px 0;
+        }
+        .minimap-line {
+            height: 3px;
+            margin: 0 6px 1px 6px;
+            display: flex;
+            gap: 1px;
+            border-radius: 1px;
+        }
+        .minimap-line.current {
+            background: rgba(255, 255, 100, 0.15);
+        }
+        .minimap-line.search-match {
+            background: rgba(155, 200, 0, 0.3);
+        }
+        .minimap-token {
+            height: 2px;
+            border-radius: 1px;
+            flex-shrink: 0;
+        }
+        .minimap-token.keyword { background: #cc7832; }
+        .minimap-token.string { background: #6a8759; }
+        .minimap-token.comment { background: #606060; }
+        .minimap-token.number { background: #6897bb; }
+        .minimap-token.variable { background: #8a8a8a; }
+        .minimap-token.function { background: #ffc66d; }
+        .minimap-token.class { background: #a9b7c6; }
+        .minimap-token.annotation { background: #bbb529; }
+        .minimap-token.text { background: #5a5a5a; }
+        .minimap-token.bracket { background: #a9b7c6; }
+        .minimap-token.operator { background: #a9b7c6; }
+        
+        #minimap-slider {
+            position: absolute;
+            left: 0;
+            right: 0;
+            background: rgba(100, 100, 100, 0.3);
+            border: 1px solid rgba(150, 150, 150, 0.3);
+            border-radius: 2px;
+            cursor: grab;
+            transition: background 0.15;
+        }
+        
+        #minimap-slider:hover {
+            background: rgba(120, 120, 120, 0.4);
+        }
+        #minimap-slider.dragging {
+            cursor: grabbing;
+            background: rgba(140, 140, 140, 0.5);
+        }
+        
+        /* Minimap Hover Highlight */
+        #minimap-hover-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+            display: none;
+        }
+        
+        #minimap:hover #minimap-hover-line {
+            display: block;
+        }
+        
+        /* Highlight current line in minimap */
+        #minimap-content .minimap-line.current {
+            background: rgba(255, 255, 0, 0.1);
+        }
+        
+        /* Minimap Search Highlights */
+        #minimap-content .minimap-line.search-match {
+            background: rgba(255, 213, 0, 0.3);
+        }
+        
+        /* Toggle button for minimap */
+        .toolbar-btn#btn-minimap {
+            font-size: 14px;
+        }
+        
+        .toolbar-btn#btn-minimap.active {
+            background: #214283;
+            border-color: #5a9cf9;
+        }
         /* Scrollbars */
         ::-webkit-scrollbar {
             width: 10px;
@@ -1525,9 +1729,19 @@
                     </div>
                 </div>
                 <div id="editor-content">
-                    <div id="no-file">
-                        <p>📝</p>
-                        <p>Open a file to start editing</p>
+                    <div id="editor-main">
+                        <div id="no-file">
+                            <p>📝</p>
+                            <p>Open a file to start editing</p>
+                        </div>
+                        <textarea id="editor"></textarea>
+                    </div>
+                    <div id="minimap-container">
+                        <button id="minimap-toggle" title="Toggle Minimap">⚏</button>
+                        <div id="minimap">
+                            <div id="minimap-viewport"></div>
+                        </div>
+                    </div>
                     </div>
                     <textarea id="editor"></textarea>
                 </div>
@@ -1721,6 +1935,8 @@
             theme: 'dracula',
             indentUnit: 4,
             indentWithTabs: false,
+            smartIndent: true,
+            electricChars: true,
             matchBrackets: true,
             autoCloseBrackets: true,
             lineWrapping: false,
@@ -1733,6 +1949,55 @@
                     } else {
                         cm.replaceSelection("    ");
                     }
+                },
+                "Enter": (cm) => {
+                    const cursor = cm.getCursor();
+                    const line = cm.getLine(cursor.line);
+                    const indent = line.match(/^\s*/)[0];
+                    const mode = cm.getOption('mode');
+                    
+                    // Java-specifikus indentálás
+                    if (mode === 'text/x-java') {
+                        const trimmedLine = line.trim();
+                        
+                        // Ha a sor { karakterrel végződik, extra indentálás
+                        if (trimmedLine.endsWith('{')) {
+                            cm.replaceSelection('\n' + indent + '    ');
+                        }
+                        // Ha a sor } karakterrel végződik, csökkentjük az indentálást
+                        else if (trimmedLine === '}' && indent.length >= 4) {
+                            cm.replaceSelection('\n' + indent.slice(4));
+                        }
+                        // Normál sor esetén megtartjuk az indentálást
+                        else {
+                            cm.replaceSelection('\n' + indent);
+                        }
+                    } else {
+                        // Más nyelvek esetén egyszerű indentálás
+                        if (line.trim().endsWith('{')) {
+                            cm.replaceSelection('\n' + indent + '    ');
+                        } else {
+                            cm.replaceSelection('\n' + indent);
+                        }
+                    }
+                },
+                "}": (cm) => {
+                    const mode = cm.getOption('mode');
+                    if (mode === 'text/x-java') {
+                        const cursor = cm.getCursor();
+                        const line = cm.getLine(cursor.line);
+                        const beforeCursor = line.slice(0, cursor.ch);
+                        
+                        // Ha a sor csak whitespace karaktereket tartalmaz a kurzor előtt
+                        if (beforeCursor.trim() === '' && beforeCursor.length >= 4) {
+                            // Csökkentjük az indentálást
+                            cm.replaceRange('', 
+                                { line: cursor.line, ch: cursor.ch - 4 }, 
+                                { line: cursor.line, ch: cursor.ch }
+                            );
+                        }
+                    }
+                    cm.replaceSelection('}');
                 }
             }
         });
@@ -2531,45 +2796,7 @@ function javaImportHint(cm) {
     };
 }
 
-// Regisztráljuk a Java hint-et
-CodeMirror.registerHelper('hint', 'java', javaImportHint);
 
-// Autocomplete gépelés közben
-let autocompleteTimeout = null;
-editor.on('inputRead', (cm, change) => {
-    if (change.origin !== '+input') return;
-    if (!/[\w\.]/.test(change.text[0])) return;
-    
-    clearTimeout(autocompleteTimeout);
-    autocompleteTimeout = setTimeout(() => {
-        const cursor = cm.getCursor();
-        const line = cm.getLine(cursor.line);
-        let start = cursor.ch;
-        
-        while (start > 0 && /[\w\.]/.test(line.charAt(start - 1))) {
-            start--;
-        }
-        
-        const word = line.slice(start, cursor.ch);
-        
-        if (word.length >= 2) {
-            const mode = cm.getOption('mode');
-            
-            if (mode === 'text/x-java') {
-                cm.showHint({
-                        hint: javaImportHint,
-                        completeSingle: false,
-                        closeOnUnfocus: true
-                        });
-                    } else {
-                        cm.showHint({
-                            completeSingle: false,
-                            closeOnUnfocus: true
-                        });
-                    }
-                }
-            }, 200);
-        });
 
         // ==================== TOAST NOTIFICATION ====================
         function showToast(message, type = 'info') {
@@ -3363,6 +3590,13 @@ function createFolderItem(name, fullPath, level) {
             document.getElementById('status-lang').textContent = getModeDisplayName(tab.mode);
 
             renderTabs();
+            
+            // Minimap frissítése
+            console.log('switchToTab: scheduling minimap update for file:', tab.path);
+            setTimeout(() => {
+                console.log('switchToTab: executing minimap update');
+                updateMinimapContent();
+            }, 100);
         }
 
         function getModeDisplayName(mode) {
@@ -3629,7 +3863,826 @@ function createFolderItem(name, fullPath, level) {
                 document.getElementById('btn-analyze').click();
             }
         });
+        // ==================== INTELLIGENT JAVA AUTOCOMPLETE ====================
 
+// Java osztályok és metódusaik
+const javaClassMethods = {
+    // Player
+    'Player': {
+        methods: [
+            { name: 'sendMessage', signature: 'sendMessage(String message)', returns: 'void', description: 'Send a message to the player' },
+            { name: 'getName', signature: 'getName()', returns: 'String', description: 'Get player name' },
+            { name: 'getUniqueId', signature: 'getUniqueId()', returns: 'UUID', description: 'Get player UUID' },
+            { name: 'getHealth', signature: 'getHealth()', returns: 'double', description: 'Get player health' },
+            { name: 'setHealth', signature: 'setHealth(double health)', returns: 'void', description: 'Set player health' },
+            { name: 'getMaxHealth', signature: 'getMaxHealth()', returns: 'double', description: 'Get max health' },
+            { name: 'getFoodLevel', signature: 'getFoodLevel()', returns: 'int', description: 'Get food level' },
+            { name: 'setFoodLevel', signature: 'setFoodLevel(int level)', returns: 'void', description: 'Set food level' },
+            { name: 'getInventory', signature: 'getInventory()', returns: 'PlayerInventory', description: 'Get player inventory' },
+            { name: 'getLocation', signature: 'getLocation()', returns: 'Location', description: 'Get player location' },
+            { name: 'teleport', signature: 'teleport(Location location)', returns: 'boolean', description: 'Teleport player' },
+            { name: 'getWorld', signature: 'getWorld()', returns: 'World', description: 'Get player world' },
+            { name: 'getGameMode', signature: 'getGameMode()', returns: 'GameMode', description: 'Get game mode' },
+            { name: 'setGameMode', signature: 'setGameMode(GameMode mode)', returns: 'void', description: 'Set game mode' },
+            { name: 'isOp', signature: 'isOp()', returns: 'boolean', description: 'Check if player is op' },
+            { name: 'hasPermission', signature: 'hasPermission(String permission)', returns: 'boolean', description: 'Check permission' },
+            { name: 'kickPlayer', signature: 'kickPlayer(String message)', returns: 'void', description: 'Kick the player' },
+            { name: 'playSound', signature: 'playSound(Location loc, Sound sound, float volume, float pitch)', returns: 'void', description: 'Play a sound' },
+            { name: 'giveExp', signature: 'giveExp(int amount)', returns: 'void', description: 'Give experience' },
+            { name: 'getLevel', signature: 'getLevel()', returns: 'int', description: 'Get XP level' },
+            { name: 'setLevel', signature: 'setLevel(int level)', returns: 'void', description: 'Set XP level' },
+            { name: 'isSneaking', signature: 'isSneaking()', returns: 'boolean', description: 'Check if sneaking' },
+            { name: 'isSprinting', signature: 'isSprinting()', returns: 'boolean', description: 'Check if sprinting' },
+            { name: 'isFlying', signature: 'isFlying()', returns: 'boolean', description: 'Check if flying' },
+            { name: 'setFlying', signature: 'setFlying(boolean flying)', returns: 'void', description: 'Set flying' },
+            { name: 'getAllowFlight', signature: 'getAllowFlight()', returns: 'boolean', description: 'Check if flight allowed' },
+            { name: 'setAllowFlight', signature: 'setAllowFlight(boolean allow)', returns: 'void', description: 'Allow/disallow flight' },
+            { name: 'openInventory', signature: 'openInventory(Inventory inventory)', returns: 'void', description: 'Open an inventory' },
+            { name: 'closeInventory', signature: 'closeInventory()', returns: 'void', description: 'Close current inventory' },
+            { name: 'updateInventory', signature: 'updateInventory()', returns: 'void', description: 'Update inventory view' },
+            { name: 'getItemInHand', signature: 'getItemInHand()', returns: 'ItemStack', description: 'Get item in main hand' },
+            { name: 'setItemInHand', signature: 'setItemInHand(ItemStack item)', returns: 'void', description: 'Set item in main hand' },
+            { name: 'getItemOnCursor', signature: 'getItemOnCursor()', returns: 'ItemStack', description: 'Get cursor item' },
+            { name: 'addPotionEffect', signature: 'addPotionEffect(PotionEffect effect)', returns: 'boolean', description: 'Add potion effect' },
+            { name: 'removePotionEffect', signature: 'removePotionEffect(PotionEffectType type)', returns: 'void', description: 'Remove potion effect' },
+            { name: 'hasPotionEffect', signature: 'hasPotionEffect(PotionEffectType type)', returns: 'boolean', description: 'Check potion effect' }
+        ]
+    },
+    
+    // Inventory
+    'Inventory': {
+        methods: [
+            { name: 'addItem', signature: 'addItem(ItemStack... items)', returns: 'HashMap<Integer, ItemStack>', description: 'Add items to inventory' },
+            { name: 'removeItem', signature: 'removeItem(ItemStack... items)', returns: 'HashMap<Integer, ItemStack>', description: 'Remove items' },
+            { name: 'getItem', signature: 'getItem(int slot)', returns: 'ItemStack', description: 'Get item at slot' },
+            { name: 'setItem', signature: 'setItem(int slot, ItemStack item)', returns: 'void', description: 'Set item at slot' },
+            { name: 'clear', signature: 'clear()', returns: 'void', description: 'Clear inventory' },
+            { name: 'getSize', signature: 'getSize()', returns: 'int', description: 'Get inventory size' },
+            { name: 'contains', signature: 'contains(Material material)', returns: 'boolean', description: 'Check if contains material' },
+            { name: 'first', signature: 'first(Material material)', returns: 'int', description: 'Get first slot with material' },
+            { name: 'firstEmpty', signature: 'firstEmpty()', returns: 'int', description: 'Get first empty slot' },
+            { name: 'getContents', signature: 'getContents()', returns: 'ItemStack[]', description: 'Get all contents' },
+            { name: 'setContents', signature: 'setContents(ItemStack[] items)', returns: 'void', description: 'Set all contents' },
+            { name: 'getHolder', signature: 'getHolder()', returns: 'InventoryHolder', description: 'Get inventory holder' },
+            { name: 'getViewers', signature: 'getViewers()', returns: 'List<HumanEntity>', description: 'Get viewers' },
+            { name: 'getType', signature: 'getType()', returns: 'InventoryType', description: 'Get inventory type' }
+        ]
+    },
+    
+    // PlayerInventory
+    'PlayerInventory': {
+        extends: 'Inventory',
+        methods: [
+            { name: 'getHelmet', signature: 'getHelmet()', returns: 'ItemStack', description: 'Get helmet' },
+            { name: 'setHelmet', signature: 'setHelmet(ItemStack helmet)', returns: 'void', description: 'Set helmet' },
+            { name: 'getChestplate', signature: 'getChestplate()', returns: 'ItemStack', description: 'Get chestplate' },
+            { name: 'setChestplate', signature: 'setChestplate(ItemStack chestplate)', returns: 'void', description: 'Set chestplate' },
+            { name: 'getLeggings', signature: 'getLeggings()', returns: 'ItemStack', description: 'Get leggings' },
+            { name: 'setLeggings', signature: 'setLeggings(ItemStack leggings)', returns: 'void', description: 'Set leggings' },
+            { name: 'getBoots', signature: 'getBoots()', returns: 'ItemStack', description: 'Get boots' },
+            { name: 'setBoots', signature: 'setBoots(ItemStack boots)', returns: 'void', description: 'Set boots' },
+            { name: 'getArmorContents', signature: 'getArmorContents()', returns: 'ItemStack[]', description: 'Get all armor' },
+            { name: 'setArmorContents', signature: 'setArmorContents(ItemStack[] armor)', returns: 'void', description: 'Set all armor' },
+            { name: 'getItemInMainHand', signature: 'getItemInMainHand()', returns: 'ItemStack', description: 'Get main hand item' },
+            { name: 'setItemInMainHand', signature: 'setItemInMainHand(ItemStack item)', returns: 'void', description: 'Set main hand item' },
+            { name: 'getItemInOffHand', signature: 'getItemInOffHand()', returns: 'ItemStack', description: 'Get off hand item' },
+            { name: 'setItemInOffHand', signature: 'setItemInOffHand(ItemStack item)', returns: 'void', description: 'Set off hand item' },
+            { name: 'getHeldItemSlot', signature: 'getHeldItemSlot()', returns: 'int', description: 'Get held slot' },
+            { name: 'setHeldItemSlot', signature: 'setHeldItemSlot(int slot)', returns: 'void', description: 'Set held slot' }
+        ]
+    },
+    
+    // ItemStack
+    'ItemStack': {
+        methods: [
+            { name: 'getType', signature: 'getType()', returns: 'Material', description: 'Get material type' },
+            { name: 'setType', signature: 'setType(Material type)', returns: 'void', description: 'Set material type' },
+            { name: 'getAmount', signature: 'getAmount()', returns: 'int', description: 'Get stack amount' },
+            { name: 'setAmount', signature: 'setAmount(int amount)', returns: 'void', description: 'Set stack amount' },
+            { name: 'getItemMeta', signature: 'getItemMeta()', returns: 'ItemMeta', description: 'Get item meta' },
+            { name: 'setItemMeta', signature: 'setItemMeta(ItemMeta meta)', returns: 'boolean', description: 'Set item meta' },
+            { name: 'hasItemMeta', signature: 'hasItemMeta()', returns: 'boolean', description: 'Check if has meta' },
+            { name: 'getMaxStackSize', signature: 'getMaxStackSize()', returns: 'int', description: 'Get max stack size' },
+            { name: 'getDurability', signature: 'getDurability()', returns: 'short', description: 'Get durability' },
+            { name: 'setDurability', signature: 'setDurability(short durability)', returns: 'void', description: 'Set durability' },
+            { name: 'clone', signature: 'clone()', returns: 'ItemStack', description: 'Clone item stack' },
+            { name: 'isSimilar', signature: 'isSimilar(ItemStack item)', returns: 'boolean', description: 'Check if similar' },
+            { name: 'getEnchantments', signature: 'getEnchantments()', returns: 'Map<Enchantment, Integer>', description: 'Get enchantments' },
+            { name: 'addEnchantment', signature: 'addEnchantment(Enchantment ench, int level)', returns: 'void', description: 'Add enchantment' },
+            { name: 'addUnsafeEnchantment', signature: 'addUnsafeEnchantment(Enchantment ench, int level)', returns: 'void', description: 'Add unsafe enchantment' },
+            { name: 'removeEnchantment', signature: 'removeEnchantment(Enchantment ench)', returns: 'int', description: 'Remove enchantment' },
+            { name: 'containsEnchantment', signature: 'containsEnchantment(Enchantment ench)', returns: 'boolean', description: 'Check enchantment' }
+        ]
+    },
+    
+    // ItemMeta
+    'ItemMeta': {
+        methods: [
+            { name: 'getDisplayName', signature: 'getDisplayName()', returns: 'String', description: 'Get display name' },
+            { name: 'setDisplayName', signature: 'setDisplayName(String name)', returns: 'void', description: 'Set display name' },
+            { name: 'hasDisplayName', signature: 'hasDisplayName()', returns: 'boolean', description: 'Check if has display name' },
+            { name: 'getLore', signature: 'getLore()', returns: 'List<String>', description: 'Get lore' },
+            { name: 'setLore', signature: 'setLore(List<String> lore)', returns: 'void', description: 'Set lore' },
+            { name: 'hasLore', signature: 'hasLore()', returns: 'boolean', description: 'Check if has lore' },
+            { name: 'hasEnchants', signature: 'hasEnchants()', returns: 'boolean', description: 'Check if has enchants' },
+            { name: 'getEnchants', signature: 'getEnchants()', returns: 'Map<Enchantment, Integer>', description: 'Get enchants' },
+            { name: 'addEnchant', signature: 'addEnchant(Enchantment ench, int level, boolean ignoreLevelRestriction)', returns: 'boolean', description: 'Add enchant' },
+            { name: 'removeEnchant', signature: 'removeEnchant(Enchantment ench)', returns: 'boolean', description: 'Remove enchant' },
+            { name: 'hasEnchant', signature: 'hasEnchant(Enchantment ench)', returns: 'boolean', description: 'Check enchant' },
+            { name: 'getEnchantLevel', signature: 'getEnchantLevel(Enchantment ench)', returns: 'int', description: 'Get enchant level' },
+            { name: 'addItemFlags', signature: 'addItemFlags(ItemFlag... flags)', returns: 'void', description: 'Add item flags' },
+            { name: 'removeItemFlags', signature: 'removeItemFlags(ItemFlag... flags)', returns: 'void', description: 'Remove item flags' },
+            { name: 'hasItemFlag', signature: 'hasItemFlag(ItemFlag flag)', returns: 'boolean', description: 'Check item flag' },
+            { name: 'isUnbreakable', signature: 'isUnbreakable()', returns: 'boolean', description: 'Check if unbreakable' },
+            { name: 'setUnbreakable', signature: 'setUnbreakable(boolean unbreakable)', returns: 'void', description: 'Set unbreakable' },
+            { name: 'clone', signature: 'clone()', returns: 'ItemMeta', description: 'Clone meta' }
+        ]
+    },
+    
+    // Location
+    'Location': {
+        methods: [
+            { name: 'getX', signature: 'getX()', returns: 'double', description: 'Get X coordinate' },
+            { name: 'getY', signature: 'getY()', returns: 'double', description: 'Get Y coordinate' },
+            { name: 'getZ', signature: 'getZ()', returns: 'double', description: 'Get Z coordinate' },
+            { name: 'setX', signature: 'setX(double x)', returns: 'void', description: 'Set X coordinate' },
+            { name: 'setY', signature: 'setY(double y)', returns: 'void', description: 'Set Y coordinate' },
+            { name: 'setZ', signature: 'setZ(double z)', returns: 'void', description: 'Set Z coordinate' },
+            { name: 'getYaw', signature: 'getYaw()', returns: 'float', description: 'Get yaw' },
+            { name: 'getPitch', signature: 'getPitch()', returns: 'float', description: 'Get pitch' },
+            { name: 'setYaw', signature: 'setYaw(float yaw)', returns: 'void', description: 'Set yaw' },
+            { name: 'setPitch', signature: 'setPitch(float pitch)', returns: 'void', description: 'Set pitch' },
+            { name: 'getWorld', signature: 'getWorld()', returns: 'World', description: 'Get world' },
+            { name: 'setWorld', signature: 'setWorld(World world)', returns: 'void', description: 'Set world' },
+            { name: 'getBlock', signature: 'getBlock()', returns: 'Block', description: 'Get block at location' },
+            { name: 'getBlockX', signature: 'getBlockX()', returns: 'int', description: 'Get block X' },
+            { name: 'getBlockY', signature: 'getBlockY()', returns: 'int', description: 'Get block Y' },
+            { name: 'getBlockZ', signature: 'getBlockZ()', returns: 'int', description: 'Get block Z' },
+            { name: 'add', signature: 'add(double x, double y, double z)', returns: 'Location', description: 'Add to location' },
+            { name: 'subtract', signature: 'subtract(double x, double y, double z)', returns: 'Location', description: 'Subtract from location' },
+            { name: 'multiply', signature: 'multiply(double m)', returns: 'Location', description: 'Multiply location' },
+            { name: 'distance', signature: 'distance(Location loc)', returns: 'double', description: 'Get distance' },
+            { name: 'distanceSquared', signature: 'distanceSquared(Location loc)', returns: 'double', description: 'Get squared distance' },
+            { name: 'clone', signature: 'clone()', returns: 'Location', description: 'Clone location' },
+            { name: 'toVector', signature: 'toVector()', returns: 'Vector', description: 'Convert to vector' },
+            { name: 'getDirection', signature: 'getDirection()', returns: 'Vector', description: 'Get direction vector' },
+            { name: 'setDirection', signature: 'setDirection(Vector vector)', returns: 'Location', description: 'Set direction' }
+        ]
+    },
+    
+    // World
+    'World': {
+        methods: [
+            { name: 'getName', signature: 'getName()', returns: 'String', description: 'Get world name' },
+            { name: 'getBlockAt', signature: 'getBlockAt(int x, int y, int z)', returns: 'Block', description: 'Get block at coords' },
+            { name: 'getBlockAt', signature: 'getBlockAt(Location loc)', returns: 'Block', description: 'Get block at location' },
+            { name: 'getPlayers', signature: 'getPlayers()', returns: 'List<Player>', description: 'Get all players' },
+            { name: 'getEntities', signature: 'getEntities()', returns: 'List<Entity>', description: 'Get all entities' },
+            { name: 'spawnEntity', signature: 'spawnEntity(Location loc, EntityType type)', returns: 'Entity', description: 'Spawn entity' },
+            { name: 'dropItem', signature: 'dropItem(Location loc, ItemStack item)', returns: 'Item', description: 'Drop item' },
+            { name: 'dropItemNaturally', signature: 'dropItemNaturally(Location loc, ItemStack item)', returns: 'Item', description: 'Drop item naturally' },
+            { name: 'createExplosion', signature: 'createExplosion(Location loc, float power)', returns: 'boolean', description: 'Create explosion' },
+            { name: 'strikeLightning', signature: 'strikeLightning(Location loc)', returns: 'LightningStrike', description: 'Strike lightning' },
+            { name: 'strikeLightningEffect', signature: 'strikeLightningEffect(Location loc)', returns: 'LightningStrike', description: 'Lightning effect only' },
+            { name: 'getTime', signature: 'getTime()', returns: 'long', description: 'Get world time' },
+            { name: 'setTime', signature: 'setTime(long time)', returns: 'void', description: 'Set world time' },
+            { name: 'getFullTime', signature: 'getFullTime()', returns: 'long', description: 'Get full time' },
+            { name: 'hasStorm', signature: 'hasStorm()', returns: 'boolean', description: 'Check if storming' },
+            { name: 'setStorm', signature: 'setStorm(boolean hasStorm)', returns: 'void', description: 'Set storm' },
+            { name: 'isThundering', signature: 'isThundering()', returns: 'boolean', description: 'Check if thundering' },
+            { name: 'setThundering', signature: 'setThundering(boolean thundering)', returns: 'void', description: 'Set thundering' },
+            { name: 'getSpawnLocation', signature: 'getSpawnLocation()', returns: 'Location', description: 'Get spawn location' },
+            { name: 'setSpawnLocation', signature: 'setSpawnLocation(int x, int y, int z)', returns: 'boolean', description: 'Set spawn location' },
+            { name: 'getDifficulty', signature: 'getDifficulty()', returns: 'Difficulty', description: 'Get difficulty' },
+            { name: 'setDifficulty', signature: 'setDifficulty(Difficulty difficulty)', returns: 'void', description: 'Set difficulty' },
+            { name: 'playSound', signature: 'playSound(Location loc, Sound sound, float volume, float pitch)', returns: 'void', description: 'Play sound' },
+            { name: 'spawnParticle', signature: 'spawnParticle(Particle particle, Location loc, int count)', returns: 'void', description: 'Spawn particle' }
+        ]
+    },
+    
+    // Block
+    'Block': {
+        methods: [
+            { name: 'getType', signature: 'getType()', returns: 'Material', description: 'Get block type' },
+            { name: 'setType', signature: 'setType(Material type)', returns: 'void', description: 'Set block type' },
+            { name: 'getLocation', signature: 'getLocation()', returns: 'Location', description: 'Get location' },
+            { name: 'getWorld', signature: 'getWorld()', returns: 'World', description: 'Get world' },
+            { name: 'getX', signature: 'getX()', returns: 'int', description: 'Get X coordinate' },
+            { name: 'getY', signature: 'getY()', returns: 'int', description: 'Get Y coordinate' },
+            { name: 'getZ', signature: 'getZ()', returns: 'int', description: 'Get Z coordinate' },
+            { name: 'getRelative', signature: 'getRelative(BlockFace face)', returns: 'Block', description: 'Get relative block' },
+            { name: 'getState', signature: 'getState()', returns: 'BlockState', description: 'Get block state' },
+            { name: 'getData', signature: 'getData()', returns: 'byte', description: 'Get block data' },
+            { name: 'getLightLevel', signature: 'getLightLevel()', returns: 'byte', description: 'Get light level' },
+            { name: 'isEmpty', signature: 'isEmpty()', returns: 'boolean', description: 'Check if empty' },
+            { name: 'isLiquid', signature: 'isLiquid()', returns: 'boolean', description: 'Check if liquid' },
+            { name: 'breakNaturally', signature: 'breakNaturally()', returns: 'boolean', description: 'Break naturally' },
+            { name: 'getDrops', signature: 'getDrops()', returns: 'Collection<ItemStack>', description: 'Get drops' }
+        ]
+    },
+    
+    // Entity
+    'Entity': {
+        methods: [
+            { name: 'getLocation', signature: 'getLocation()', returns: 'Location', description: 'Get location' },
+            { name: 'getWorld', signature: 'getWorld()', returns: 'World', description: 'Get world' },
+            { name: 'teleport', signature: 'teleport(Location loc)', returns: 'boolean', description: 'Teleport entity' },
+            { name: 'getEntityId', signature: 'getEntityId()', returns: 'int', description: 'Get entity ID' },
+            { name: 'getUniqueId', signature: 'getUniqueId()', returns: 'UUID', description: 'Get UUID' },
+            { name: 'isDead', signature: 'isDead()', returns: 'boolean', description: 'Check if dead' },
+            { name: 'isValid', signature: 'isValid()', returns: 'boolean', description: 'Check if valid' },
+            { name: 'remove', signature: 'remove()', returns: 'void', description: 'Remove entity' },
+            { name: 'getType', signature: 'getType()', returns: 'EntityType', description: 'Get entity type' },
+            { name: 'getVelocity', signature: 'getVelocity()', returns: 'Vector', description: 'Get velocity' },
+            { name: 'setVelocity', signature: 'setVelocity(Vector velocity)', returns: 'void', description: 'Set velocity' },
+            { name: 'isOnGround', signature: 'isOnGround()', returns: 'boolean', description: 'Check if on ground' },
+            { name: 'getNearbyEntities', signature: 'getNearbyEntities(double x, double y, double z)', returns: 'List<Entity>', description: 'Get nearby entities' },
+            { name: 'getPassengers', signature: 'getPassengers()', returns: 'List<Entity>', description: 'Get passengers' },
+            { name: 'addPassenger', signature: 'addPassenger(Entity passenger)', returns: 'boolean', description: 'Add passenger' },
+            { name: 'eject', signature: 'eject()', returns: 'boolean', description: 'Eject passengers' },
+            { name: 'getCustomName', signature: 'getCustomName()', returns: 'String', description: 'Get custom name' },
+            { name: 'setCustomName', signature: 'setCustomName(String name)', returns: 'void', description: 'Set custom name' },
+            { name: 'setCustomNameVisible', signature: 'setCustomNameVisible(boolean visible)', returns: 'void', description: 'Set name visible' },
+            { name: 'isCustomNameVisible', signature: 'isCustomNameVisible()', returns: 'boolean', description: 'Check if name visible' }
+        ]
+    },
+    
+    // LivingEntity
+    'LivingEntity': {
+        extends: 'Entity',
+        methods: [
+            { name: 'getHealth', signature: 'getHealth()', returns: 'double', description: 'Get health' },
+            { name: 'setHealth', signature: 'setHealth(double health)', returns: 'void', description: 'Set health' },
+            { name: 'getMaxHealth', signature: 'getMaxHealth()', returns: 'double', description: 'Get max health' },
+            { name: 'setMaxHealth', signature: 'setMaxHealth(double health)', returns: 'void', description: 'Set max health' },
+            { name: 'damage', signature: 'damage(double amount)', returns: 'void', description: 'Damage entity' },
+            { name: 'getEyeLocation', signature: 'getEyeLocation()', returns: 'Location', description: 'Get eye location' },
+            { name: 'getEyeHeight', signature: 'getEyeHeight()', returns: 'double', description: 'Get eye height' },
+            { name: 'addPotionEffect', signature: 'addPotionEffect(PotionEffect effect)', returns: 'boolean', description: 'Add potion effect' },
+            { name: 'removePotionEffect', signature: 'removePotionEffect(PotionEffectType type)', returns: 'void', description: 'Remove potion effect' },
+            { name: 'getActivePotionEffects', signature: 'getActivePotionEffects()', returns: 'Collection<PotionEffect>', description: 'Get active effects' },
+            { name: 'hasPotionEffect', signature: 'hasPotionEffect(PotionEffectType type)', returns: 'boolean', description: 'Check potion effect' },
+            { name: 'getKiller', signature: 'getKiller()', returns: 'Player', description: 'Get killer' },
+            { name: 'getTargetBlock', signature: 'getTargetBlock(Set<Material> transparent, int maxDistance)', returns: 'Block', description: 'Get target block' },
+            { name: 'getLastDamage', signature: 'getLastDamage()', returns: 'double', description: 'Get last damage' },
+            { name: 'getNoDamageTicks', signature: 'getNoDamageTicks()', returns: 'int', description: 'Get no damage ticks' },
+            { name: 'setNoDamageTicks', signature: 'setNoDamageTicks(int ticks)', returns: 'void', description: 'Set no damage ticks' }
+        ]
+    },
+    
+    // Bukkit
+    'Bukkit': {
+        methods: [
+            { name: 'getServer', signature: 'getServer()', returns: 'Server', description: 'Get server instance', static: true },
+            { name: 'getOnlinePlayers', signature: 'getOnlinePlayers()', returns: 'Collection<Player>', description: 'Get online players', static: true },
+            { name: 'getPlayer', signature: 'getPlayer(String name)', returns: 'Player', description: 'Get player by name', static: true },
+            { name: 'getPlayer', signature: 'getPlayer(UUID uuid)', returns: 'Player', description: 'Get player by UUID', static: true },
+            { name: 'getOfflinePlayer', signature: 'getOfflinePlayer(String name)', returns: 'OfflinePlayer', description: 'Get offline player', static: true },
+            { name: 'getWorld', signature: 'getWorld(String name)', returns: 'World', description: 'Get world by name', static: true },
+            { name: 'getWorlds', signature: 'getWorlds()', returns: 'List<World>', description: 'Get all worlds', static: true },
+            { name: 'createWorld', signature: 'createWorld(WorldCreator creator)', returns: 'World', description: 'Create world', static: true },
+            { name: 'getPluginManager', signature: 'getPluginManager()', returns: 'PluginManager', description: 'Get plugin manager', static: true },
+            { name: 'getScheduler', signature: 'getScheduler()', returns: 'BukkitScheduler', description: 'Get scheduler', static: true },
+            { name: 'getConsoleSender', signature: 'getConsoleSender()', returns: 'ConsoleCommandSender', description: 'Get console sender', static: true },
+            { name: 'broadcastMessage', signature: 'broadcastMessage(String message)', returns: 'int', description: 'Broadcast message', static: true },
+            { name: 'dispatchCommand', signature: 'dispatchCommand(CommandSender sender, String command)', returns: 'boolean', description: 'Dispatch command', static: true },
+            { name: 'createInventory', signature: 'createInventory(InventoryHolder owner, int size, String title)', returns: 'Inventory', description: 'Create inventory', static: true },
+            { name: 'getItemFactory', signature: 'getItemFactory()', returns: 'ItemFactory', description: 'Get item factory', static: true },
+            { name: 'shutdown', signature: 'shutdown()', returns: 'void', description: 'Shutdown server', static: true },
+            { name: 'reload', signature: 'reload()', returns: 'void', description: 'Reload server', static: true }
+        ]
+    },
+    
+    // BukkitScheduler
+    'BukkitScheduler': {
+        methods: [
+            { name: 'runTask', signature: 'runTask(Plugin plugin, Runnable task)', returns: 'BukkitTask', description: 'Run task sync' },
+            { name: 'runTaskLater', signature: 'runTaskLater(Plugin plugin, Runnable task, long delay)', returns: 'BukkitTask', description: 'Run task later' },
+            { name: 'runTaskTimer', signature: 'runTaskTimer(Plugin plugin, Runnable task, long delay, long period)', returns: 'BukkitTask', description: 'Run repeating task' },
+            { name: 'runTaskAsynchronously', signature: 'runTaskAsynchronously(Plugin plugin, Runnable task)', returns: 'BukkitTask', description: 'Run async task' },
+            { name: 'runTaskLaterAsynchronously', signature: 'runTaskLaterAsynchronously(Plugin plugin, Runnable task, long delay)', returns: 'BukkitTask', description: 'Run async later' },
+            { name: 'runTaskTimerAsynchronously', signature: 'runTaskTimerAsynchronously(Plugin plugin, Runnable task, long delay, long period)', returns: 'BukkitTask', description: 'Run async repeating' },
+            { name: 'cancelTask', signature: 'cancelTask(int taskId)', returns: 'void', description: 'Cancel task by ID' },
+            { name: 'cancelTasks', signature: 'cancelTasks(Plugin plugin)', returns: 'void', description: 'Cancel all plugin tasks' },
+            { name: 'isCurrentlyRunning', signature: 'isCurrentlyRunning(int taskId)', returns: 'boolean', description: 'Check if task running' },
+            { name: 'isQueued', signature: 'isQueued(int taskId)', returns: 'boolean', description: 'Check if task queued' }
+        ]
+    },
+    
+    // JavaPlugin
+    'JavaPlugin': {
+        methods: [
+            { name: 'onEnable', signature: 'onEnable()', returns: 'void', description: 'Called when plugin enables', override: true },
+            { name: 'onDisable', signature: 'onDisable()', returns: 'void', description: 'Called when plugin disables', override: true },
+            { name: 'onLoad', signature: 'onLoad()', returns: 'void', description: 'Called when plugin loads', override: true },
+            { name: 'getConfig', signature: 'getConfig()', returns: 'FileConfiguration', description: 'Get config' },
+            { name: 'saveConfig', signature: 'saveConfig()', returns: 'void', description: 'Save config' },
+            { name: 'reloadConfig', signature: 'reloadConfig()', returns: 'void', description: 'Reload config' },
+            { name: 'saveDefaultConfig', signature: 'saveDefaultConfig()', returns: 'void', description: 'Save default config' },
+            { name: 'getDataFolder', signature: 'getDataFolder()', returns: 'File', description: 'Get data folder' },
+            { name: 'getResource', signature: 'getResource(String filename)', returns: 'InputStream', description: 'Get resource' },
+            { name: 'saveResource', signature: 'saveResource(String resourcePath, boolean replace)', returns: 'void', description: 'Save resource' },
+            { name: 'getLogger', signature: 'getLogger()', returns: 'Logger', description: 'Get logger' },
+            { name: 'getServer', signature: 'getServer()', returns: 'Server', description: 'Get server' },
+            { name: 'getDescription', signature: 'getDescription()', returns: 'PluginDescriptionFile', description: 'Get plugin description' },
+            { name: 'isEnabled', signature: 'isEnabled()', returns: 'boolean', description: 'Check if enabled' },
+            { name: 'getCommand', signature: 'getCommand(String name)', returns: 'PluginCommand', description: 'Get command' }
+        ]
+    },
+    
+    // FileConfiguration
+    'FileConfiguration': {
+        methods: [
+            { name: 'getString', signature: 'getString(String path)', returns: 'String', description: 'Get string value' },
+            { name: 'getString', signature: 'getString(String path, String def)', returns: 'String', description: 'Get string with default' },
+            { name: 'getInt', signature: 'getInt(String path)', returns: 'int', description: 'Get int value' },
+            { name: 'getInt', signature: 'getInt(String path, int def)', returns: 'int', description: 'Get int with default' },
+            { name: 'getDouble', signature: 'getDouble(String path)', returns: 'double', description: 'Get double value' },
+            { name: 'getBoolean', signature: 'getBoolean(String path)', returns: 'boolean', description: 'Get boolean value' },
+            { name: 'getLong', signature: 'getLong(String path)', returns: 'long', description: 'Get long value' },
+            { name: 'getStringList', signature: 'getStringList(String path)', returns: 'List<String>', description: 'Get string list' },
+            { name: 'getIntegerList', signature: 'getIntegerList(String path)', returns: 'List<Integer>', description: 'Get integer list' },
+            { name: 'getList', signature: 'getList(String path)', returns: 'List<Object>', description: 'Get list' },
+            { name: 'set', signature: 'set(String path, Object value)', returns: 'void', description: 'Set value' },
+            { name: 'contains', signature: 'contains(String path)', returns: 'boolean', description: 'Check if path exists' },
+            { name: 'getKeys', signature: 'getKeys(boolean deep)', returns: 'Set<String>', description: 'Get all keys' },
+            { name: 'getConfigurationSection', signature: 'getConfigurationSection(String path)', returns: 'ConfigurationSection', description: 'Get section' },
+            { name: 'createSection', signature: 'createSection(String path)', returns: 'ConfigurationSection', description: 'Create section' },
+            { name: 'isSet', signature: 'isSet(String path)', returns: 'boolean', description: 'Check if set' }
+        ]
+    },
+    
+    // Event classes
+    'Event': {
+        methods: [
+            { name: 'getHandlers', signature: 'getHandlers()', returns: 'HandlerList', description: 'Get handlers', override: true },
+            { name: 'getEventName', signature: 'getEventName()', returns: 'String', description: 'Get event name' },
+            { name: 'isAsynchronous', signature: 'isAsynchronous()', returns: 'boolean', description: 'Check if async' }
+        ]
+    },
+    
+    'Cancellable': {
+        methods: [
+            { name: 'isCancelled', signature: 'isCancelled()', returns: 'boolean', description: 'Check if cancelled' },
+            { name: 'setCancelled', signature: 'setCancelled(boolean cancel)', returns: 'void', description: 'Set cancelled' }
+        ]
+    }
+};
+
+// Override metódus sablonok
+const overrideTemplates = {
+    'onEnable': `@Override
+public void onEnable() {
+    getLogger().info("Plugin enabled!");
+}`,
+    'onDisable': `@Override
+public void onDisable() {
+    getLogger().info("Plugin disabled!");
+}`,
+    'onLoad': `@Override
+public void onLoad() {
+    // Called before onEnable
+}`,
+    'onCommand': `@Override
+public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    if (command.getName().equalsIgnoreCase("commandname")) {
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            // Command logic here
+            return true;
+        }
+    }
+    return false;
+}`,
+    'onTabComplete': `@Override
+public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+    List<String> completions = new ArrayList<>();
+    if (args.length == 1) {
+        // Add completions for first argument
+    }
+    return completions;
+}`,
+    'run': `@Override
+public void run() {
+    // Task logic here
+}`,
+    'equals': `@Override
+public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null || getClass() != obj.getClass()) return false;
+    // Compare fields
+    return true;
+}`,
+    'hashCode': `@Override
+public int hashCode() {
+    return Objects.hash(/* fields */);
+}`,
+    'toString': `@Override
+public String toString() {
+    return "ClassName{" +
+            // fields
+            '}';
+}`,
+    'clone': `@Override
+public Object clone() throws CloneNotSupportedException {
+    return super.clone();
+}`
+};
+
+// Event handler sablonok
+const eventHandlerTemplates = {
+    'PlayerJoinEvent': `@EventHandler
+public void onPlayerJoin(PlayerJoinEvent event) {
+    Player player = event.getPlayer();
+    event.setJoinMessage(ChatColor.GREEN + player.getName() + " joined the game!");
+}`,
+    'PlayerQuitEvent': `@EventHandler
+public void onPlayerQuit(PlayerQuitEvent event) {
+    Player player = event.getPlayer();
+    event.setQuitMessage(ChatColor.RED + player.getName() + " left the game!");
+}`,
+    'PlayerMoveEvent': `@EventHandler
+public void onPlayerMove(PlayerMoveEvent event) {
+    Player player = event.getPlayer();
+    Location from = event.getFrom();
+    Location to = event.getTo();
+}`,
+    'PlayerInteractEvent': `@EventHandler
+public void onPlayerInteract(PlayerInteractEvent event) {
+    Player player = event.getPlayer();
+    Action action = event.getAction();
+    if (action == Action.RIGHT_CLICK_BLOCK || action == Action.RIGHT_CLICK_AIR) {
+        // Handle right click
+    }
+}`,
+    'BlockBreakEvent': `@EventHandler
+public void onBlockBreak(BlockBreakEvent event) {
+    Player player = event.getPlayer();
+    Block block = event.getBlock();
+    // event.setCancelled(true); // Cancel if needed
+}`,
+    'BlockPlaceEvent': `@EventHandler
+public void onBlockPlace(BlockPlaceEvent event) {
+    Player player = event.getPlayer();
+    Block block = event.getBlock();
+    // event.setCancelled(true); // Cancel if needed
+}`,
+    'EntityDamageEvent': `@EventHandler
+public void onEntityDamage(EntityDamageEvent event) {
+    Entity entity = event.getEntity();
+    double damage = event.getDamage();
+    DamageCause cause = event.getCause();
+}`,
+    'EntityDamageByEntityEvent': `@EventHandler
+public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+    Entity damager = event.getDamager();
+    Entity victim = event.getEntity();
+    if (damager instanceof Player) {
+        Player attacker = (Player) damager;
+    }
+}`,
+    'InventoryClickEvent': `@EventHandler
+public void onInventoryClick(InventoryClickEvent event) {
+    Player player = (Player) event.getWhoClicked();
+    ItemStack clicked = event.getCurrentItem();
+    int slot = event.getSlot();
+    // event.setCancelled(true); // Cancel if needed
+}`,
+    'AsyncPlayerChatEvent': `@EventHandler
+public void onPlayerChat(AsyncPlayerChatEvent event) {
+    Player player = event.getPlayer();
+    String message = event.getMessage();
+    // event.setFormat("[%s] %s"); // Custom format
+}`
+};
+
+// Változók nyomon követése a kódban
+let detectedVariables = {};
+
+// Változók elemzése az aktuális fájlban
+function analyzeVariables(code) {
+    detectedVariables = {};
+    
+    // Regex minták változók keresésére
+    const patterns = [
+        // Type variable = ...
+        /(\w+)\s+(\w+)\s*=\s*(?:new\s+)?(\w+)?/g,
+        // Type variable;
+        /(\w+)\s+(\w+)\s*;/g,
+        // for (Type variable : ...)
+        /for\s*\(\s*(\w+)\s+(\w+)\s*:/g,
+        // method parameters
+        /\(([^)]+)\)/g
+    ];
+    
+    const lines = code.split('\n');
+    lines.forEach((line, lineIndex) => {
+        // Type variable = new Type()
+        let match = line.match(/(\w+)\s+(\w+)\s*=\s*new\s+(\w+)/);
+        if (match) {
+            detectedVariables[match[2]] = match[3] || match[1];
+        }
+        
+        // Type variable = expression
+        match = line.match(/^[\s]*(Player|Inventory|ItemStack|ItemMeta|Location|World|Block|Entity|LivingEntity)\s+(\w+)\s*=/);
+        if (match) {
+            detectedVariables[match[2]] = match[1];
+        }
+        
+        // Player player = (Player) sender;
+        match = line.match(/(\w+)\s+(\w+)\s*=\s*\(\s*(\w+)\s*\)/);
+        if (match) {
+            detectedVariables[match[2]] = match[3];
+        }
+        
+        // event.getPlayer()
+        match = line.match(/(\w+)\s+(\w+)\s*=\s*\w+\.getPlayer\(\)/);
+        if (match) {
+            detectedVariables[match[2]] = 'Player';
+        }
+        
+        // player.getInventory()
+        match = line.match(/(\w+)\s+(\w+)\s*=\s*\w+\.getInventory\(\)/);
+        if (match) {
+            detectedVariables[match[2]] = 'PlayerInventory';
+        }
+        
+        // item.getItemMeta()
+        match = line.match(/(\w+)\s+(\w+)\s*=\s*\w+\.getItemMeta\(\)/);
+        if (match) {
+            detectedVariables[match[2]] = 'ItemMeta';
+        }
+        
+        // player.getLocation()
+        match = line.match(/(\w+)\s+(\w+)\s*=\s*\w+\.getLocation\(\)/);
+        if (match) {
+            detectedVariables[match[2]] = 'Location';
+        }
+        
+        // player.getWorld()
+        match = line.match(/(\w+)\s+(\w+)\s*=\s*\w+\.getWorld\(\)/);
+        if (match) {
+            detectedVariables[match[2]] = 'World';
+        }
+    });
+    
+    return detectedVariables;
+}
+
+// Metódusok lekérése egy osztályhoz (beleértve az öröklöttet)
+function getMethodsForClass(className) {
+    let methods = [];
+    let currentClass = javaClassMethods[className];
+    
+    while (currentClass) {
+        if (currentClass.methods) {
+            methods = methods.concat(currentClass.methods);
+        }
+        currentClass = currentClass.extends ? javaClassMethods[currentClass.extends] : null;
+    }
+    
+    return methods;
+}
+
+// Intelligens Java autocomplete
+function intelligentJavaHint(cm) {
+    const cursor = cm.getCursor();
+    const line = cm.getLine(cursor.line);
+    const end = cursor.ch;
+    let start = end;
+    
+    // Visszafelé keresés
+    while (start > 0 && /[\w\.]/.test(line.charAt(start - 1))) {
+        start--;
+    }
+    
+    const word = line.slice(start, end);
+    const completions = [];
+    
+    // Frissítsük a változó listát
+    const fullCode = cm.getValue();
+    analyzeVariables(fullCode);
+    
+    // 1. Pont után metódus javaslatok (pl: player.)
+    if (word.includes('.')) {
+        const parts = word.split('.');
+        const varName = parts[0];
+        const methodPrefix = parts[1] || '';
+        
+        // Keressük meg a változó típusát
+        let varType = detectedVariables[varName];
+        
+        // Speciális esetek
+        if (varName === 'Bukkit') varType = 'Bukkit';
+        if (varName === 'getServer()') varType = 'Server';
+        if (varName === 'getConfig()') varType = 'FileConfiguration';
+        if (varName === 'getScheduler()') varType = 'BukkitScheduler';
+        
+        if (varType) {
+            const methods = getMethodsForClass(varType);
+            methods.forEach(method => {
+                if (method.name.toLowerCase().startsWith(methodPrefix.toLowerCase())) {
+                    completions.push({
+                        text: method.name + (method.signature.includes('()') ? '()' : '('),
+                        displayText: `${method.name} → ${method.returns}`,
+                        className: 'completion-method',
+                        render: function(element, self, data) {
+                            element.innerHTML = `
+                                <span style="color: #ffc66d;">${method.name}</span>
+                                <span style="color: #888;">(${method.signature.replace(method.name, '')})</span>
+                                <span style="color: #6a8759; margin-left: 10px;">→ ${method.returns}</span>
+                            `;
+                        }
+                    });
+                }
+            });
+        }
+        
+        if (completions.length > 0) {
+            return {
+                list: completions,
+                from: CodeMirror.Pos(cursor.line, start + parts[0].length + 1),
+                to: CodeMirror.Pos(cursor.line, end)
+            };
+        }
+    }
+    
+    // 2. Import javaslatok
+    const trimmedLine = line.trim();
+    if (trimmedLine.startsWith('import ')) {
+        const allImports = getAllImports();
+        const searchWord = word.replace('import ', '').toLowerCase();
+        
+        allImports.forEach(imp => {
+            if (imp.toLowerCase().includes(searchWord)) {
+                completions.push({
+                    text: imp + ';',
+                    displayText: imp,
+                    className: 'completion-import'
+                });
+            }
+        });
+        
+        if (completions.length > 0) {
+            return {
+                list: completions.slice(0, 20),
+                from: CodeMirror.Pos(cursor.line, line.indexOf('import ') + 7),
+                to: CodeMirror.Pos(cursor.line, end)
+            };
+        }
+    }
+    
+    // 3. Override metódus javaslatok
+    const overrideKeywords = ['onCommand', 'onTabComplete', 'onEnable', 'onDisable', 'onLoad', 'run', 'equals', 'hashCode', 'toString', 'clone'];
+    overrideKeywords.forEach(keyword => {
+        if (keyword.toLowerCase().startsWith(word.toLowerCase()) && word.length >= 2) {
+            if (overrideTemplates[keyword]) {
+                completions.push({
+                    text: overrideTemplates[keyword],
+                    displayText: `@Override ${keyword}() → method template`,
+                    className: 'completion-override'
+                });
+            }
+        }
+    });
+    
+    // 4. Event handler javaslatok
+    Object.keys(eventHandlerTemplates).forEach(eventName => {
+        if (eventName.toLowerCase().includes(word.toLowerCase()) && word.length >= 2) {
+            completions.push({
+                text: eventHandlerTemplates[eventName],
+                displayText: `@EventHandler ${eventName} → handler template`,
+                className: 'completion-event'
+            });
+        }
+    });
+    
+    // 5. Gyakori code snippetek
+    const snippets = [
+        { trigger: 'sout', text: 'System.out.println();', display: 'sout → System.out.println()' },
+        { trigger: 'soutv', text: 'System.out.println("variable = " + variable);', display: 'soutv → print variable' },
+        { trigger: 'serr', text: 'System.err.println();', display: 'serr → System.err.println()' },
+        { trigger: 'psvm', text: 'public static void main(String[] args) {\n    \n}', display: 'psvm → main method' },
+        { trigger: 'fori', text: 'for (int i = 0; i < length; i++) {\n    \n}', display: 'fori → for loop' },
+        { trigger: 'fore', text: 'for (Type item : collection) {\n    \n}', display: 'fore → foreach loop' },
+        { trigger: 'if', text: 'if (condition) {\n    \n}', display: 'if → if statement' },
+        { trigger: 'ifelse', text: 'if (condition) {\n    \n} else {\n    \n}', display: 'ifelse → if-else' },
+        { trigger: 'trycatch', text: 'try {\n    \n} catch (Exception e) {\n    e.printStackTrace();\n}', display: 'trycatch → try-catch block' },
+        { trigger: 'switch', text: 'switch (variable) {\n    case value:\n        break;\n    default:\n        break;\n}', display: 'switch → switch statement' },
+        { trigger: 'while', text: 'while (condition) {\n    \n}', display: 'while → while loop' },
+        { trigger: 'newitem', text: 'ItemStack item = new ItemStack(Material.DIAMOND);\nItemMeta meta = item.getItemMeta();\nmeta.setDisplayName(ChatColor.GOLD + "Item Name");\nitem.setItemMeta(meta);', display: 'newitem → create ItemStack with meta' },
+        { trigger: 'newinv', text: 'Inventory inv = Bukkit.createInventory(null, 27, "Inventory Title");', display: 'newinv → create Inventory' },
+        { trigger: 'newloc', text: 'Location loc = new Location(world, x, y, z);', display: 'newloc → create Location' },
+        { trigger: 'scheduler', text: 'Bukkit.getScheduler().runTaskLater(this, () -> {\n    // Code here\n}, 20L);', display: 'scheduler → delayed task (20 ticks = 1 sec)' },
+        { trigger: 'async', text: 'Bukkit.getScheduler().runTaskAsynchronously(this, () -> {\n    // Async code here\n});', display: 'async → async task' },
+        { trigger: 'repeating', text: 'Bukkit.getScheduler().runTaskTimer(this, () -> {\n    // Repeating code\n}, 0L, 20L);', display: 'repeating → repeating task' },
+        { trigger: 'broadcast', text: 'Bukkit.broadcastMessage(ChatColor.GREEN + "Message");', display: 'broadcast → broadcast message' },
+        { trigger: 'permission', text: 'if (player.hasPermission("plugin.permission")) {\n    \n}', display: 'permission → permission check' },
+        { trigger: 'configget', text: 'getConfig().getString("path");', display: 'configget → get config value' },
+        { trigger: 'configset', text: 'getConfig().set("path", value);\nsaveConfig();', display: 'configset → set and save config' },
+        { trigger: 'registerevents', text: 'getServer().getPluginManager().registerEvents(this, this);', display: 'registerevents → register events' },
+        { trigger: 'logger', text: 'getLogger().info("Message");', display: 'logger → log info message' },
+        { trigger: 'logerr', text: 'getLogger().severe("Error message");', display: 'logerr → log error message' }
+    ];
+    
+    snippets.forEach(snippet => {
+        if (snippet.trigger.toLowerCase().startsWith(word.toLowerCase()) && word.length >= 2) {
+            completions.push({
+                text: snippet.text,
+                displayText: snippet.display,
+                className: 'completion-snippet'
+            });
+        }
+    });
+    
+    // 6. Java kulcsszavak
+    const keywords = [
+        'public', 'private', 'protected', 'static', 'final', 'abstract',
+        'class', 'interface', 'extends', 'implements', 'enum',
+        'void', 'int', 'long', 'double', 'float', 'boolean', 'char', 'byte', 'short',
+        'String', 'Integer', 'Long', 'Double', 'Boolean', 'Object', 'List', 'Map', 'Set',
+        'ArrayList', 'HashMap', 'HashSet', 'LinkedList',
+        'if', 'else', 'for', 'while', 'do', 'switch', 'case', 'default', 'break', 'continue',
+        'return', 'try', 'catch', 'finally', 'throw', 'throws',
+        'new', 'this', 'super', 'null', 'true', 'false',
+        'import', 'package', 'instanceof', 'synchronized', 'volatile'
+    ];
+    
+    keywords.forEach(kw => {
+        if (kw.toLowerCase().startsWith(word.toLowerCase()) && word.length >= 2) {
+            completions.push({
+                text: kw,
+                displayText: kw,
+                className: 'completion-keyword'
+            });
+        }
+    });
+    
+    if (completions.length === 0) {
+        return null;
+    }
+    
+    // Rendezés
+    completions.sort((a, b) => {
+        const aText = a.displayText.toLowerCase();
+        const bText = b.displayText.toLowerCase();
+        const wordLower = word.toLowerCase();
+        
+        const aExact = aText.startsWith(wordLower);
+        const bExact = bText.startsWith(wordLower);
+        
+        if (aExact && !bExact) return -1;
+        if (!aExact && bExact) return 1;
+        
+        return aText.length - bText.length;
+    });
+    
+    return {
+        list: completions.slice(0, 20),
+        from: CodeMirror.Pos(cursor.line, start),
+        to: CodeMirror.Pos(cursor.line, end)
+    };
+}
+
+// Regisztráljuk a hint helper-t
+CodeMirror.registerHelper('hint', 'java-intelligent', intelligentJavaHint);
+
+// Autocomplete gépelés közben
+let autocompleteTimeout = null;
+editor.on('inputRead', (cm, change) => {
+    if (change.origin !== '+input') return;
+    if (!/[\w\.]/.test(change.text[0])) return;
+    
+    clearTimeout(autocompleteTimeout);
+    autocompleteTimeout = setTimeout(() => {
+        const cursor = cm.getCursor();
+        const line = cm.getLine(cursor.line);
+        let start = cursor.ch;
+        
+        while (start > 0 && /[\w\.]/.test(line.charAt(start - 1))) {
+            start--;
+        }
+        
+        const word = line.slice(start, cursor.ch);
+        
+        if (word.length >= 2 || word.includes('.')) {
+            const mode = cm.getOption('mode');
+            
+            if (mode === 'text/x-java') {
+                cm.showHint({
+                    hint: intelligentJavaHint,
+                    completeSingle: false,
+                    closeOnUnfocus: true
+                });
+            } else {
+                cm.showHint({
+                    completeSingle: false,
+                    closeOnUnfocus: true
+                });
+            }
+        }
+    }, 150);
+});
         // ==================== IPC LISTENERS ====================
         ipcRenderer.on('open-folder', (event, folderPath) => openProject(folderPath));
         ipcRenderer.on('save-file', () => saveCurrentFile());
@@ -3644,8 +4697,307 @@ function createFolderItem(name, fullPath, level) {
         ipcRenderer.on('analyze-problems', () => {
             document.getElementById('btn-analyze').click();
         });
+        // ==================== MINIMAP ====================
+        let minimapEnabled = true;
+        let minimapScale = 0.4; // Skálázási arány
+        let isDraggingSlider = false;
+        let minimapUpdateTimeout = null;
+            
+        const minimapContainer = document.getElementById('minimap-container');
+        const minimap = document.getElementById('minimap');
+        const minimapViewport = document.getElementById('minimap-viewport');
+        const minimapToggle = document.getElementById('minimap-toggle');
+            
+        // Minimap inicializálása
+        function initMinimap() {
+            if (!minimapContainer) return;
+            
+            // Minimap toggle gomb
+            minimapToggle.addEventListener('click', toggleMinimap);
+            
+            // Minimap kattintás - ugrás a pozícióra
+            minimap.addEventListener('click', (e) => {
+                const rect = minimap.getBoundingClientRect();
+                const clickY = e.clientY - rect.top;
+                const containerHeight = minimap.offsetHeight;
+                
+                const scrollInfo = editor.getScrollInfo();
+                const totalLines = editor.lineCount();
+                const clickRatio = clickY / containerHeight;
+                const targetLine = Math.floor(clickRatio * totalLines);
+                
+                editor.scrollIntoView({ line: targetLine, ch: 0 });
+                editor.setCursor(targetLine, 0);
+            });
+            
+            // Slider drag
+            minimapSlider.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                isDraggingSlider = true;
+                minimapSlider.classList.add('dragging');
+                
+                const startY = e.clientY;
+                const startScrollTop = editor.getScrollInfo().top;
+                
+                const onMouseMove = (e) => {
+                    if (!isDraggingSlider) return;
+                    
+                    const deltaY = e.clientY - startY;
+                    const scrollInfo = editor.getScrollInfo();
+                    const containerHeight = minimapContainer.offsetHeight;
+                    const contentHeight = minimap.offsetHeight;
+                    
+                    // Számítsuk ki az új scroll pozíciót
+                    const scrollRatio = deltaY / containerHeight;
+                    const maxScroll = scrollInfo.height - scrollInfo.clientHeight;
+                    const newScroll = startScrollTop + (scrollRatio * maxScroll);
+                    
+                    editor.scrollTo(null, Math.max(0, Math.min(maxScroll, newScroll)));
+                };
+                
+                const onMouseUp = () => {
+                    isDraggingSlider = false;
+                    minimapSlider.classList.remove('dragging');
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                };
+                
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            });
+            
+            // Hover effect - egyszerűsített
+            minimapContainer.addEventListener('mousemove', (e) => {
+                // Hover effekt később implementálható
+            });
+        }
         
+        // Minimap tartalom frissítése
+        function updateMinimapContent() {
+            console.log('updateMinimapContent called', { minimapEnabled, currentFile, containerExists: !!minimapContainer });
+            
+            if (!minimapEnabled || !minimapContainer || !currentFile) {
+                console.log('Minimap hidden due to conditions');
+                if (minimapContainer) minimapContainer.classList.add('hidden');
+                return;
+            }
+            
+            console.log('Showing minimap');
+            minimapContainer.classList.remove('hidden');
+            
+            const code = editor.getValue();
+            if (!code || code.trim() === '') {
+                console.log('Empty file, hiding minimap');
+                minimapContainer.classList.add('hidden');
+                return;
+            }
+            
+            const lines = code.split('\n');
+            console.log('Processing', lines.length, 'lines for minimap');
+            
+            // Nagy fájlok esetén mintavételezés
+            const maxLines = 2000; // Maximum 2000 sor a minimap-ben
+            const totalLines = lines.length;
+            let displayLines = lines;
+            let lineStep = 1;
+            
+            if (totalLines > maxLines) {
+                lineStep = Math.ceil(totalLines / maxLines);
+                displayLines = [];
+                for (let i = 0; i < totalLines; i += lineStep) {
+                    displayLines.push({ content: lines[i], originalIndex: i });
+                }
+            } else {
+                displayLines = lines.map((line, index) => ({ content: line, originalIndex: index }));
+            }
+            
+            let html = '';
+            
+            displayLines.forEach((lineData, index) => {
+                const line = lineData.content;
+                const originalIndex = lineData.originalIndex;
+                const trimmedLine = line.trim();
+                const opacity = trimmedLine ? 0.6 : 0.1;
+                
+                // Csak az első 30 karaktert jelenítjük meg
+                const displayText = trimmedLine.substring(0, 30) || ' ';
+                
+                html += `<div class="minimap-line" data-line="${originalIndex}" style="opacity: ${opacity};">`;
+                html += displayText;
+                html += '</div>';
+            });
+            
+            minimap.innerHTML = html;
+            console.log('Minimap HTML updated, lines displayed:', displayLines.length);
+            updateMinimapViewport();
+        }
+        
+        // Egyszerű tokenizer a minimap-hez
+        function tokenizeLine(line, mode) {
+            const tokens = [];
+            
+            if (!line.trim()) {
+                return tokens;
+            }
+            
+            // Java/JavaScript patterns
+            const patterns = [
+                { regex: /\/\/.*$/, type: 'comment' },
+                { regex: /\/\*.*?\*\//, type: 'comment' },
+                { regex: /"(?:[^"\\]|\\.)*"/, type: 'string' },
+                { regex: /'(?:[^'\\]|\\.)*'/, type: 'string' },
+                { regex: /@\w+/, type: 'annotation' },
+                { regex: /\b(public|private|protected|static|final|abstract|class|interface|extends|implements|void|int|long|double|float|boolean|char|byte|short|String|return|if|else|for|while|do|switch|case|break|continue|try|catch|finally|throw|throws|new|this|super|null|true|false|import|package|const|let|var|function|async|await)\b/, type: 'keyword' },
+                { regex: /\b\d+\.?\d*\b/, type: 'number' },
+                { regex: /\b[A-Z][a-zA-Z0-9]*\b/, type: 'class' },
+                { regex: /\b\w+(?=\s*\()/, type: 'function' },
+                { regex: /[{}()\[\]]/, type: 'bracket' },
+                { regex: /[+\-*/%=<>!&|^~?:]/, type: 'operator' },
+                { regex: /\w+/, type: 'variable' }
+            ];
+            
+            let remaining = line;
+            let pos = 0;
+            
+            while (remaining.length > 0) {
+                // Skip whitespace
+                const wsMatch = remaining.match(/^\s+/);
+                if (wsMatch) {
+                    remaining = remaining.slice(wsMatch[0].length);
+                    pos += wsMatch[0].length;
+                    continue;
+                }
+                
+                let matched = false;
+                
+                for (const pattern of patterns) {
+                    const match = remaining.match(pattern.regex);
+                    if (match && match.index === 0) {
+                        tokens.push({
+                            text: match[0],
+                            type: pattern.type,
+                            start: pos
+                        });
+                        remaining = remaining.slice(match[0].length);
+                        pos += match[0].length;
+                        matched = true;
+                        break;
+                    }
+                }
+                
+                if (!matched) {
+                    // Unknown character
+                    remaining = remaining.slice(1);
+                    pos++;
+                }
+            }
+            
+            return tokens;
+        }
+        
+        // Minimap slider pozíció frissítése
+        function updateMinimapViewport() {
+            if (!minimapEnabled || minimapContainer.classList.contains('hidden')) return;
+            
+            const scrollInfo = editor.getScrollInfo();
+            const containerHeight = minimap.offsetHeight;
+            const totalLines = editor.lineCount();
+            
+            if (totalLines === 0 || scrollInfo.height === 0) return;
+            
+            // Viewport méret a látható sorok arányában
+            const visibleLines = Math.floor(scrollInfo.clientHeight / editor.defaultTextHeight());
+            const viewportHeight = Math.max(10, (visibleLines / totalLines) * containerHeight);
+            
+            // Viewport pozíció
+            const firstVisibleLine = editor.lineAtHeight(scrollInfo.top, 'local');
+            const viewportTop = (firstVisibleLine / totalLines) * containerHeight;
+            
+            minimapViewport.style.height = viewportHeight + 'px';
+            minimapViewport.style.top = Math.max(0, Math.min(containerHeight - viewportHeight, viewportTop)) + 'px';
+        }
+        
+        // Aktuális sor kiemelése a minimap-ben
+        function updateMinimapCurrentLine() {
+            if (!minimapEnabled) return;
+            
+            // Előző kiemelés eltávolítása
+            document.querySelectorAll('.minimap-line.current').forEach(el => {
+                el.classList.remove('current');
+            });
+            
+            // Aktuális sor kiemelése
+            const cursor = editor.getCursor();
+            const currentLine = minimap.querySelector(`.minimap-line[data-line="${cursor.line}"]`);
+            if (currentLine) {
+                currentLine.classList.add('current');
+            }
+        }
+        
+        // Minimap toggle
+        function toggleMinimap() {
+            minimapEnabled = !minimapEnabled;
+            
+            if (minimapEnabled) {
+                minimapContainer.classList.remove('hidden');
+                updateMinimapContent();
+            } else {
+                minimapContainer.classList.add('hidden');
+            }
+            
+            // Mentés localStorage-ba
+            localStorage.setItem('xenoeditor-minimap', minimapEnabled);
+        }
+        
+        // Minimap beállítás betöltése
+        function loadMinimapSetting() {
+            const saved = localStorage.getItem('xenoeditor-minimap');
+            if (saved !== null) {
+                minimapEnabled = saved === 'true';
+            }
+            
+            console.log('Minimap setting loaded:', minimapEnabled);
+            
+            if (!minimapEnabled) {
+                minimapContainer.classList.add('hidden');
+            } else {
+                minimapContainer.classList.remove('hidden');
+            }
+        }
+        
+        // Editor scroll event - slider frissítése
+        editor.on('scroll', () => {
+            updateMinimapViewport();
+        });
+        
+        // Editor change event - tartalom frissítése
+        editor.on('change', () => {
+            clearTimeout(minimapUpdateTimeout);
+            const lineCount = editor.lineCount();
+            const debounceTime = lineCount > 1000 ? 800 : 300; // Hosszabb debounce nagy fájlokhoz
+            
+            minimapUpdateTimeout = setTimeout(() => {
+                updateMinimapContent();
+            }, debounceTime);
+        });
+        
+        // Kurzor változás - aktuális sor kiemelése
+        editor.on('cursorActivity', () => {
+            updateMinimapCurrentLine();
+        });
+        
+        // Inicializálás
+        initMinimap();
+        loadMinimapSetting();
+        
+        // Hover line elem hozzáadása
+        const hoverLine = document.createElement('div');
+        hoverLine.id = 'minimap-hover-line';
+        minimapContainer.appendChild(hoverLine);
         // ==================== START ====================
+        initMinimap();
+        loadMinimapSetting();
         showWelcome();
     </script>
 </body>
